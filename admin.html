@@ -286,7 +286,7 @@ details .hint{margin-top:10px}
     setupEl.hidden=true;
     dashEl.hidden=false;
   }
-  function cleanApi(v){return String(v||'').trim().replace(/\s+/g,'');}
+  function cleanApi(v){return String(v||'').trim().replace(/\s+/g,'').replace(/\/+$/,'');}
 
   function jsonp(params){
     return new Promise(function(resolve,reject){
