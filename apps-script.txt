@@ -96,17 +96,14 @@ function doRsvp_(sh, p) {
   var name = String(p.name || '').trim().slice(0, 120);
   var r = String(p.r || 'yes').toLowerCase();
   var status = (r === 'no' || r === '0' || r === 'declined') ? STATUS.no : STATUS.yes;
-  var row = id ? findRow_(sh, id) : 0;
+  if (!id) throw new Error('missing_id');
+  var row = findRow_(sh, id);
+  if (!row) throw new Error('unknown_guest');
   var now = new Date();
-  if (!row) {
-    var newId = id || makeId_();
-    sh.appendRow([newId, name || 'ضيف', normPhone_(p.phone || ''), status, now, '']);
-    return { id: newId, name: name, status: status, added: true };
-  }
   sh.getRange(row, 4).setValue(status);
   sh.getRange(row, 5).setValue(now);
   if (name && !String(sh.getRange(row, 2).getValue())) sh.getRange(row, 2).setValue(name);
-  return { id: id, name: name, status: status, added: false };
+  return { id: id, name: name, status: status };
 }
 
 function doList_(sh) {

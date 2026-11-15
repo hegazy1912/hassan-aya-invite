@@ -464,7 +464,7 @@ details .hint{margin-top:10px}
         addBtn.textContent=old;
         return load(true);
       }
-      var chunk=list.slice(done,done+15);
+      var chunk=list.slice(done,done+10);
       addBtn.textContent='بيضيف... '+Math.min(done+chunk.length,list.length)+'/'+list.length;
       jsonp({action:'addbulk',key:state.key,data:JSON.stringify(chunk)}).then(function(res){
         if(!res||!res.ok)throw new Error((res&&res.error)||'فشل');
