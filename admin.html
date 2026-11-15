@@ -435,9 +435,13 @@ details .hint{margin-top:10px}
       if(digitCount(a)>=8){phone=a;name=parts.slice(1).join(' ');}
       else{phone=b;name=parts.slice(0,-1).join(' ');}
     }else{
-      var m=line.match(/^(.*?)[\s\-–—:]*(\+?\d[\d\s\-]{7,})\s*$/);
-      if(m){name=m[1];phone=m[2];}
-      else{name=line;}
+      var m0=line.match(/^(\+?\d[\d\s\-]{7,})[\s\-–—:]+(.+)$/);
+      if(m0){phone=m0[1];name=m0[2];}
+      else{
+        var m=line.match(/^(.*?)[\s\-–—:]*(\+?\d[\d\s\-]{7,})\s*$/);
+        if(m){name=m[1];phone=m[2];}
+        else{name=line;}
+      }
     }
     name=String(name||'').replace(/[\s\-–—:]+$/,'').trim();
     return {name:name,phone:normalizePhone(phone)};
