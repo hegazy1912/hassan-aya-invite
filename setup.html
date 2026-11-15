@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تجهيز شيت الردود — حسن &amp; آية</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070a12;--panel:#0e1320;--line:rgba(216,184,120,.22);--gold:#d8b878;--cream:#f8f1e4;--muted:rgba(248,241,228,.55);--green:#25d366;--red:#ff7a7a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:
+  radial-gradient(circle at 12% 0%,rgba(216,184,120,.10),transparent 35%),
+  radial-gradient(circle at 90% 8%,rgba(143,199,255,.07),transparent 40%),var(--bg);
+  color:var(--cream);font-family:"Cairo","Segoe UI",Tahoma,sans-serif;font-size:14px;line-height:1.9}
+main{width:min(1000px,100%);margin:0 auto;padding:clamp(18px,4vw,44px) clamp(12px,3vw,26px) 80px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.mono{font-family:"Cormorant Garamond",serif;font-size:26px;letter-spacing:.06em;color:var(--gold)}
+.mono i{font-style:italic;font-weight:400;color:var(--cream);padding:0 2px}
+.mono small{font-family:"Cairo",sans-serif;font-size:11px;letter-spacing:2px;color:var(--muted);margin-right:10px}
+.btn{border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--cream);
+  padding:9px 16px;border-radius:999px;font-size:12px;letter-spacing:.4px;transition:.2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.btn:hover{border-color:rgba(216,184,120,.6);background:rgba(216,184,120,.10)}
+.btn.gold{background:rgba(216,184,120,.92);border-color:rgba(216,184,120,.92);color:#1a1208;font-weight:600}
+.btn.gold:hover{background:#eccf98}
+.btn.green{background:rgba(37,211,102,.14);border-color:rgba(37,211,102,.45);color:#8ff0b3}
+.btn.green:hover{background:rgba(37,211,102,.24)}
+.panel{background:linear-gradient(180deg,rgba(19,26,42,.92),rgba(10,14,24,.96));border:1px solid var(--line);
+  border-radius:18px;padding:clamp(16px,2.6vw,28px);box-shadow:0 20px 60px rgba(0,0,0,.28)}
+.panel+.panel{margin-top:16px}
+h1{font-size:clamp(21px,3.2vw,30px);font-weight:600;margin-bottom:6px}
+h2{font-size:16px;margin-bottom:8px}
+p{color:var(--muted);font-size:13px}
+.lead{margin-bottom:18px}
+.keyBox{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.keyBox input{flex:1;min-width:220px;background:rgba(4,7,14,.7);border:1px solid rgba(216,184,120,.22);
+  color:var(--gold);border-radius:12px;padding:12px 14px;font-size:13px;direction:ltr;font-family:Consolas,monospace;outline:none}
+.steps{list-style:none;counter-reset:s;display:grid;gap:12px;margin-top:8px}
+.steps li{counter-increment:s;position:relative;padding:14px 52px 14px 16px;border:1px solid rgba(216,184,120,.14);
+  border-radius:14px;background:rgba(255,255,255,.022);color:var(--muted);font-size:12.5px;line-height:2}
+.steps li:before{content:counter(s);position:absolute;right:16px;top:14px;width:26px;height:26px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(216,184,120,.14);border:1px solid rgba(216,184,120,.4);color:var(--gold);font-size:12px}
+.steps b{color:var(--cream);font-weight:600}
+.kbd{display:inline-block;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  border-radius:6px;padding:1px 7px;font-size:11.5px;color:var(--cream);direction:ltr;font-family:Consolas,monospace}
+.codeWrap{margin-top:16px;border:1px solid rgba(216,184,120,.2);border-radius:14px;overflow:hidden;background:rgba(3,5,10,.7)}
+.codeHead{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;
+  background:rgba(216,184,120,.07);border-bottom:1px solid rgba(216,184,120,.16);font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-align:left;font-family:Consolas,"Courier New",monospace;
+  font-size:11.5px;line-height:1.7;color:#cfe3ff;white-space:pre;tab-size:2}
+.note{margin-top:14px;padding:11px 14px;border-radius:12px;font-size:11.5px;line-height:1.9;
+  background:rgba(216,184,120,.07);border:1px solid rgba(216,184,120,.22);color:var(--gold)}
+.err{color:var(--red)}
+.footActions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translate(-50%,18px);opacity:0;pointer-events:none;
+  background:rgba(17,23,36,.97);border:1px solid rgba(216,184,120,.4);color:var(--cream);
+  padding:11px 20px;border-radius:999px;font-size:12px;transition:.3s;z-index:50;max-width:92vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div class="mono">H <i>&amp;</i> A <small>تجهيز شيت الردود</small></div>
+    <div>
+      <a class="btn" href="admin.html">لوحة الإدارة</a>
+      <a class="btn" href="./">الدعوة</a>
+    </div>
+  </div>
+
+  <section class="panel">
+    <h1>خطوة واحدة قبل ما تبعت الدعوات</h1>
+    <p class="lead">عشان الردود تتسجل أوتوماتيك في Google Sheet، هنعمل شيت صغير ونربطه بالدعوة. المجهود كله 5 دقايق، ومجاني تمامًا.</p>
+    <p><b style="color:var(--cream)">مفتاحك السري:</b> اتولد تلقائيًا واتحفظ على الجهاز ده. لو هتفتح لوحة الإدارة من جهاز/متصفح تاني، انسخه معاك.</p>
+    <div class="keyBox">
+      <input id="key" readonly>
+      <button class="btn" id="copyKey">نسخ المفتاح</button>
+      <button class="btn" id="newKey">مفتاح جديد</button>
+    </div>
+    <div class="note">مهم: لو غيّرت المفتاح بعد ما ظبطت الشيت، لازم تفتح Apps Script وتستبدل الكود بالكود الجديد اللي تحت، وتعمل Deploy من جديد.</div>
+  </section>
+
+  <section class="panel">
+    <h2>الخطوات</h2>
+    <ol class="steps">
+      <li><b>اعمل شيت جديد:</b> افتح <a href="https://sheets.new" target="_blank" rel="noopener" style="color:var(--gold)">sheets.new</a> وسمّيه أي اسم.</li>
+      <li>من داخل الشيت: <b>Extensions</b> ← <b>Apps Script</b>.</li>
+      <li>امسح أي كود موجود، وبعدين <b>الصق الكود اللي تحت</b> بالكامل.</li>
+      <li>اضغط <b>Deploy</b> ← <b>New deployment</b> ← اختار نوع <b>Web app</b>.</li>
+      <li>اختار <b>Execute as: Me</b> و <b>Who has access: Anyone</b>، وبعدين اضغط <b>Deploy</b> ووافق على الصلاحيات.</li>
+      <li>انسخ رابط الـ Web app اللي بينتهي بـ <span class="kbd">/exec</span>.</li>
+      <li>افتح <a href="admin.html" style="color:var(--gold)">لوحة الإدارة</a>، الصق الرابط والمفتاح، واضغط <b>حفظ واختبار</b>.</li>
+    </ol>
+    <div class="codeWrap">
+      <div class="codeHead">
+        <span>apps-script.gs — الصق ده في Apps Script</span>
+        <span>
+          <button class="btn" id="copyCode">نسخ الكود</button>
+          <button class="btn" id="downloadCode">تنزيل</button>
+        </span>
+      </div>
+      <pre id="code">بيتم تحميل الكود...</pre>
+    </div>
+    <div class="note" id="msg"></div>
+    <div class="footActions">
+      <a class="btn gold" href="admin.html">فتح لوحة الإدارة</a>
+      <a class="btn" href="https://sheets.new" target="_blank" rel="noopener">افتح شيت جديد</a>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>ملاحظات سريعة</h2>
+    <p>• المفتاح السري بيمنع أي حد يشوف أرقام الضيوف أو يعدل فيها. متحطهوش في رسالة عامة.</p>
+    <p>• أول مرة بس هتسمح لـ Apps Script بالوصول للشيت.</p>
+    <p>• لو عدّلت الكود بعدين، اعمل Deploy ← Manage deployments ← Edit ← New version.</p>
+    <p>• الضيوف مش محتاجين أي حساب — بيفتحوا الدعوة ويضغطوا زرار واحد.</p>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+  'use strict';
+  var keyEl=document.getElementById('key'),codeEl=document.getElementById('code'),msgEl=document.getElementById('msg'),toastEl=document.getElementById('toast');
+  var code='';
+  function toast(t){toastEl.textContent=t;toastEl.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){toastEl.classList.remove('on');},2800);}
+  function makeKey(){
+    var chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+    var arr=new Uint8Array(24);
+    if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(arr);
+    else for(var i=0;i<arr.length;i++)arr[i]=Math.floor(Math.random()*256);
+    var s='GIFT-';
+    for(var j=0;j<arr.length;j++)s+=chars.charAt(arr[j]%chars.length);
+    return s;
+  }
+  function getKey(){
+    var k='';
+    try{k=localStorage.getItem('gift.key')||'';}catch(e){}
+    if(!k){k=makeKey();try{localStorage.setItem('gift.key',k);}catch(e){}}
+    return k;
+  }
+  function copyText(t){
+    function fallback(){
+      var x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();
+      try{document.execCommand('copy');toast('اتنسخ ✅');}catch(e){toast('مش قادر أنسخ، حدد وانسخ يدوي');}
+      x.remove();
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){toast('اتنسخ ✅');},fallback);
+    else fallback();
+  }
+  function paint(){
+    var k=getKey();
+    keyEl.value=k;
+    codeEl.textContent=code?code.split('__ADMIN_KEY__').join(k):'';
+  }
+  function loadCode(){
+    fetch('apps-script.txt',{cache:'no-store'}).then(function(r){
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      return r.text();
+    }).then(function(t){
+      code=t;
+      paint();
+      msgEl.className='note';
+      msgEl.textContent='الكود جاهز. لو الصفحة دي مفتوحة من الموقع المنشور، هتلاقي الكود فوق.';
+    }).catch(function(err){
+      msgEl.className='note err';
+      msgEl.textContent='مش قادر أحمّل الكود ('+err.message+'). افتح الصفحة من الرابط المنشور على الإنترنت، مش من الملف المحلي.';
+    });
+  }
+  document.getElementById('copyKey').onclick=function(){copyText(keyEl.value);};
+  document.getElementById('newKey').onclick=function(){
+    if(!confirm('لو غيّرت المفتاح، لازم تحدّث الكود في Apps Script وتعمل Deploy من جديد. تكمل؟'))return;
+    var k=makeKey();
+    try{localStorage.setItem('gift.key',k);}catch(e){}
+    paint();
+    toast('اتولد مفتاح جديد');
+  };
+  document.getElementById('copyCode').onclick=function(){
+    if(!code){toast('الكود لسه بيحمّل');return;}
+    copyText(codeEl.textContent);
+  };
+  document.getElementById('downloadCode').onclick=function(){
+    if(!code){toast('الكود لسه بيحمّل');return;}
+    var blob=new Blob([codeEl.textContent],{type:'text/plain;charset=utf-8;'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='apps-script.gs';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(a.href);},1200);
+  };
+  paint();
+  loadCode();
+})();
+</script>
+</body>
+</html>
