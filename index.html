@@ -581,7 +581,7 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
         <span class="combo">
           <span class="mono"><i class="h">H</i><i class="a">A</i></span>
 
-          <span class="dateLine"><i></i>12 · 06 · 2027<i></i></span>
+          <span class="dateLine"><i></i>18 · 11 · 2026<i></i></span>
           <span class="word first">Hassan</span>
           <em class="amp">&amp;</em>
           <span class="word last">Aya</span>
@@ -590,12 +590,12 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
       <p class="l3 invite">بيقولولكم تعالوا تفرحوا معانا</p>
       <div class="l4 rule"></div>
       <div class="l5 when">
-        <span>الجمعة</span>
-        <b>١٢ يونيو</b>
+        <span>الأربعاء</span>
+        <b>١٨ نوفمبر</b>
         <span class="dot"></span>
         <b>٨ مساءً</b>
       </div>
-      <div class="l6 where">قاعة النيل &nbsp;·&nbsp; التجمع الخامس</div>
+      <div class="l6 where">ليلة العمر &nbsp;·&nbsp; عزبة النخل</div>
       <div class="l7 cta">
         <button id="rsvp">أكيد جاي</button>
         <button id="no">مش هعرف أجي</button>
@@ -618,12 +618,12 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
       <h3 id="thTitle">تمام يا صاحبي</h3>
       <p>فرحنا هيبقى أحلى بوجودك</p>
       <div class="thInfo">
-        <b>الجمعة ١٢ يونيو · ٨ مساءً</b>
-        <span>قاعة النيل — التجمع الخامس</span>
+        <b>الأربعاء ١٨ نوفمبر · ٨ مساءً</b>
+        <span>ليلة العمر — عزبة النخل</span>
       </div>
       <div class="thBtns">
         <a id="thWa" href="#" target="_blank" rel="noopener" hidden>ابعت تأكيد واتساب</a>
-        <a id="thMap" href="https://maps.google.com/?q=قاعة+النيل+التجمع+الخامس" target="_blank" rel="noopener">افتح الخريطة</a>
+        <a id="thMap" href="https://maps.app.goo.gl/RhDDS28mYLeqBVtw6" target="_blank" rel="noopener">افتح الخريطة</a>
         <button id="thClose">قفل</button>
       </div>
       <small class="thSync" id="thSync"></small>
@@ -648,7 +648,7 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
 
       <div class="envStage" aria-hidden="true">
         <div class="env" id="envBox">
-          <div class="envCard"><span class="envMono">H <i>&amp;</i> A</span><span class="envDate">12 · 06 · 2027</span></div>
+          <div class="envCard"><span class="envMono">H <i>&amp;</i> A</span><span class="envDate">18 · 11 · 2026</span></div>
           <div class="envBody"></div>
           <div class="envInside"></div>
           <div class="envCast" id="envCast"><div class="castInner" id="castInner"></div></div>
@@ -660,7 +660,7 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
         <div class="iHint">دوس تفتح</div>
       </div>
 
-      <div class="iSub">12 · 06 · 2027</div>
+      <div class="iSub">18 · 11 · 2026</div>
     </div>
     <div class="flash" id="flash"></div>
   </div>
@@ -1052,12 +1052,7 @@ function dodge(cx,cy){
 }
 noBtn.addEventListener('mouseenter',(e)=>dodge(e.clientX,e.clientY));
 noBtn.addEventListener('click',(e)=>{e.preventDefault();e.stopPropagation();dodge(e.clientX,e.clientY);});
-noBtn.addEventListener('touchstart',(e)=>{e.preventDefault();const t=e.touches[0];dodge(t?t.clientX:null,t?t.clientY:null);},{passive:false});
-document.addEventListener('mousemove',(e)=>{
-  const r=noBtn.getBoundingClientRect();
-  const d=Math.hypot(e.clientX-(r.left+r.width/2),e.clientY-(r.top+r.height/2));
-  if(d<115)dodge(e.clientX,e.clientY);
-},{passive:true});
+noBtn.addEventListener('touchstart',(e)=>{e.preventDefault();e.stopPropagation();dodge(e.touches[0]?e.touches[0].clientX:null,e.touches[0]?e.touches[0].clientY:null);},{passive:false});
 
 const thanks=document.getElementById('thanks');
 const qs=new URLSearchParams(location.search);
