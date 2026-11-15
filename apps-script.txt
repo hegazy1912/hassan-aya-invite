@@ -118,7 +118,7 @@ function doList_(sh) {
       id: String(r[0]),
       name: String(r[1] || ''),
       phone: String(r[2] || ''),
-      status: String(r[3] || STATUS.pending),
+      status: String(r[3] || '').trim() || STATUS.pending,
       respondedAt: iso_(r[4]),
       sentAt: iso_(r[5])
     });
