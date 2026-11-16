@@ -63,6 +63,11 @@ body{background:#04060d;color:var(--cream);font-family:"Cairo","Segoe UI",Tahoma
 .screen[hidden]{display:none}
 .screen h2{font-size:clamp(20px,4.6vw,28px);font-weight:600;margin:14px 0 6px;color:#fdf6e9}
 .screen p{font-size:13px;line-height:1.9;color:rgba(248,241,228,.62);max-width:420px;margin:0 auto}
+.pinBox{display:grid;gap:12px;justify-items:center;width:min(320px,84vw);margin:16px auto 0}
+#pinInput{width:100%;text-align:center;font-family:inherit;font-size:24px;letter-spacing:12px;padding:14px 12px;border-radius:16px;
+  background:rgba(10,14,26,.6);border:1px solid rgba(216,184,120,.4);color:#fdf6e9;outline:none;direction:ltr}
+#pinInput:focus{border-color:rgba(216,184,120,.9);box-shadow:0 0 0 3px rgba(216,184,120,.15)}
+#pinErr{font-size:12px;color:#ffd9a0;min-height:16px}
 .fan{position:relative;width:260px;height:190px;margin:0 auto}
 .fan .lt-grp{left:30px;top:30px}
 .lock{position:absolute;left:50%;top:46%;width:74px;height:74px;margin:-37px 0 0 -37px;z-index:20;cursor:pointer;filter:drop-shadow(0 8px 18px rgba(0,0,0,.6))}
@@ -115,6 +120,18 @@ body{background:#04060d;color:var(--cream);font-family:"Cairo","Segoe UI",Tahoma
         <div class="cd" id="cd"><div><b id="cdD">٠</b><span>يوم</span></div><div><b id="cdH">٠</b><span>ساعة</span></div><div><b id="cdM">٠</b><span>دقيقة</span></div><div><b id="cdS">٠</b><span>ثانية</span></div></div>
       </div>
     </div>
+    <div class="screen" id="sPin" hidden>
+      <div>
+        <div style="font-size:44px">🔐</div>
+        <h2>اكتب الـPIN</h2>
+        <p>الـPIN اللي وصلك في رسالة منفصلة مع اللينك. مش مكتوب في اللينك نفسه.</p>
+        <div class="pinBox">
+          <input id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="••••">
+          <button class="go" id="pinGo">افتح الرسايل</button>
+          <p id="pinErr"></p>
+        </div>
+      </div>
+    </div>
     <div class="end" id="sEnd" hidden>
       <div><div style="font-size:54px">💛</div><h2 style="font-size:24px;margin:10px 0 6px">خلصت الرسايل</h2><p id="endP" style="color:rgba(248,241,228,.7);font-size:13px"></p>
         <div style="margin-top:16px"><button class="go" id="again">من الأول</button></div></div>
@@ -141,6 +158,8 @@ var hp=new URLSearchParams(String(location.hash||'').replace(/^#/,''));
 var DEMO=qs.get('demo')==='1', DEMO_LOCKED=qs.get('locked')==='1';
 var API=String(GIFT.RSVP_URL||'').trim()||String(hp.get('e')||'').trim();
 var KEY=String(hp.get('k')||qs.get('k')||'').trim();
+var PIN_KEY='gift.msgpin.'+KEY;
+var PIN='';try{PIN=sessionStorage.getItem(PIN_KEY)||'';}catch(e){}
 var $=function(id){return document.getElementById(id);};
 var A=LET.A, sleep=LET.sleep, ar=function(n){try{return Number(n).toLocaleString('ar-EG');}catch(e){return String(n);}};
 
@@ -154,7 +173,7 @@ var A=LET.A, sleep=LET.sleep, ar=function(n){try{return Number(n).toLocaleString
     p.style.cssText='width:'+z+'px;height:'+z*.8+'px;left:'+Math.random()*100+'%;opacity:'+(.2+Math.random()*.4)+';animation-duration:'+(11+Math.random()*14)+'s;animation-delay:'+(-Math.random()*18)+'s';pt.appendChild(p);}
 })();
 function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){e.classList.remove('on');},2600);}
-function show(id){['sLoad','sErr','sEmpty','sLock'].forEach(function(k){$(k).hidden=(k!==id);});}
+function show(id){['sLoad','sErr','sEmpty','sLock','sPin'].forEach(function(k){$(k).hidden=(k!==id);});}
 function hideAll(){show('');}
 function fail(t,p){$('eT').textContent=t;$('eP').textContent=p||'';show('sErr');setUI(false);}
 
@@ -177,7 +196,7 @@ var DEMO_MSGS=[
  {name:'ماما نجلاء',c:'mint',text:'ربنا يبارك لكم ويسعدكم يا حبايبي، وتفضلوا دايمًا إيد واحدة. اللهم بارك.'},
  {name:'كريم',c:'cream',text:'فاكر أول مرة قلتلي إنك هتتجوز؟ ضحكت عليك. دلوقتي بتقدم لك الشاي في فرحك. ألف مبروك 🎉'}
 ];
-function loadData(){
+function loadData(pin){
   if(DEMO){
     var arr=DEMO_MSGS.slice();
     try{(JSON.parse(localStorage.getItem('gift.demo.msgs')||'[]')).forEach(function(m){arr.push({name:m.name,c:m.c,text:m.text});});}catch(e){}
@@ -186,7 +205,7 @@ function loadData(){
   }
   if(!API)return Promise.reject(new Error('noapi'));
   if(!KEY)return Promise.reject(new Error('nokey'));
-  return jsonp({action:'msgs',key:KEY});
+  return jsonp({action:'msgs',key:KEY,pin:pin||''});
 }
 
 /* ---------- حالة العرض ---------- */
@@ -327,12 +346,20 @@ function lockScreen(res){
 $('lockBtn').onclick=function(){var b=$('lockBtn');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');LET.sfx.tick();toast('لسه بدري 😄 استنوا بعد الفرح');};
 
 /* ---------- تشغيل ---------- */
-function init(){
+function pinGate(msg){
+  setUI(false);show('sPin');
+  $('pinErr').textContent=msg||'';
+  var inp=$('pinInput'),btn=$('pinGo');
+  inp.value='';inp.disabled=false;btn.disabled=false;
+  setTimeout(function(){try{inp.focus();}catch(e){}},150);
+}
+function start(pin,remember){
   show('sLoad');
   var f=(document.fonts&&document.fonts.load)?Promise.race([document.fonts.load('17px "Aref Ruqaa"'),sleep(1800)]):Promise.resolve();
-  Promise.all([loadData(),f]).then(function(r){
+  Promise.all([loadData(pin),f]).then(function(r){
     var res=r[0];
     if(!res||!res.ok)throw new Error((res&&res.error)||'failed');
+    if(remember){PIN=pin;try{sessionStorage.setItem(PIN_KEY,pin);}catch(e){}}
     if(res.locked){lockScreen(res);return;}
     S.msgs=res.messages||[];
     if(!S.msgs.length){setUI(false);show('sEmpty');return;}
@@ -340,12 +367,29 @@ function init(){
     enter(1).then(function(){S.busy=false;setBtn();});
   }).catch(function(e){
     var m=String(e&&e.message||e);
+    if(m==='bad_pin'){
+      PIN='';try{sessionStorage.removeItem(PIN_KEY);}catch(e){}
+      pinGate('الـPIN غلط، جرّب تاني.');
+      return;
+    }
     if(m==='noapi')fail('اللينك ناقص','مفيش رابط للشيت. افتح اللينك اللي اتبعتلك بالظبط (فيه #k=… و e=…).');
     else if(m==='nokey')fail('اللينك ناقص المفتاح','اطلب اللينك الصح من اللي جهّز الدعوة.');
     else if(m==='unauthorized')fail('المفتاح غلط','اللينك ده مش مطابق للشيت.');
     else fail('مش قادرين نفتح الصندوق','جرّب تعمل ريفريش. ('+m+')');
   });
 }
+function init(){
+  if(DEMO||!KEY){start('',false);return;}
+  if(PIN){start(PIN,false);return;}
+  pinGate('');
+}
+$('pinGo').onclick=function(){
+  var v=String($('pinInput').value||'').replace(/\D/g,'');
+  if(v.length!==4){$('pinErr').textContent='اكتب 4 أرقام.';return;}
+  $('pinGo').disabled=true;
+  start(v,true);
+};
+$('pinInput').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('pinGo').click();}});
 setUI(false);init();
 })();
 </script>

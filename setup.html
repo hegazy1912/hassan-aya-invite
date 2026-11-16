@@ -85,7 +85,13 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
       <button class="btn" id="copyMsgKey">نسخ المفتاح</button>
       <button class="btn" id="newMsgKey">مفتاح جديد</button>
     </div>
-    <div class="note">مهم: لو غيّرت أي مفتاح بعد ما ظبطت الشيت، لازم تفتح Apps Script وتستبدل الكود بالكود الجديد اللي تحت، وتعمل Deploy من جديد.</div>
+    <p style="margin-top:16px"><b style="color:var(--cream)">PIN رسايل العريس:</b> 4 أرقام إضافية. اللينك لوحده مش هيفتح الرسايل — ابعته للعريس في رسالة منفصلة.</p>
+    <div class="keyBox">
+      <input id="msgPin" readonly inputmode="numeric" maxlength="4">
+      <button class="btn" id="copyMsgPin">نسخ الـPIN</button>
+      <button class="btn" id="newMsgPin">PIN جديد</button>
+    </div>
+    <div class="note">مهم: لو غيّرت أي مفتاح أو الـPIN بعد ما ظبطت الشيت، لازم تفتح Apps Script وتستبدل الكود بالكود الجديد اللي تحت، وتعمل Deploy من جديد.</div>
   </section>
 
   <section class="panel">
@@ -128,7 +134,7 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
 <script>
 (function(){
   'use strict';
-  var keyEl=document.getElementById('key'),msgKeyEl=document.getElementById('msgKey'),codeEl=document.getElementById('code'),msgEl=document.getElementById('msg'),toastEl=document.getElementById('toast');
+  var keyEl=document.getElementById('key'),msgKeyEl=document.getElementById('msgKey'),pinEl=document.getElementById('msgPin'),codeEl=document.getElementById('code'),msgEl=document.getElementById('msg'),toastEl=document.getElementById('toast');
   var code='';
   function toast(t){toastEl.textContent=t;toastEl.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){toastEl.classList.remove('on');},2800);}
   function makeKey(prefix){
@@ -152,6 +158,18 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
     if(!k){k=makeKey('MSG-');try{localStorage.setItem('gift.msgkey',k);}catch(e){}}
     return k;
   }
+  function makePin(){
+    var a=new Uint32Array(1);
+    if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(a);
+    else a[0]=Math.floor(Math.random()*9000)+1000;
+    return String(1000+(a[0]%9000));
+  }
+  function getMsgPin(){
+    var p='';
+    try{p=String(localStorage.getItem('gift.msgpin')||'').replace(/\D/g,'').slice(0,4);}catch(e){}
+    if(p.length!==4){p=makePin();try{localStorage.setItem('gift.msgpin',p);}catch(e){}}
+    return p;
+  }
   function copyText(t){
     function fallback(){
       var x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();
@@ -162,9 +180,9 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
     else fallback();
   }
   function paint(){
-    var k=getKey(),mk=getMsgKey();
-    keyEl.value=k;msgKeyEl.value=mk;
-    codeEl.textContent=code?code.split('__ADMIN_KEY__').join(k).split('__MSG_KEY__').join(mk):'';
+    var k=getKey(),mk=getMsgKey(),pin=getMsgPin();
+    keyEl.value=k;msgKeyEl.value=mk;pinEl.value=pin;
+    codeEl.textContent=code?code.split('__ADMIN_KEY__').join(k).split('__MSG_KEY__').join(mk).split('__MSG_PIN__').join(pin):'';
   }
   function loadCode(){
     fetch('apps-script.txt',{cache:'no-store'}).then(function(r){
@@ -182,6 +200,7 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
   }
   document.getElementById('copyKey').onclick=function(){copyText(keyEl.value);};
   document.getElementById('copyMsgKey').onclick=function(){copyText(msgKeyEl.value);};
+  document.getElementById('copyMsgPin').onclick=function(){copyText(pinEl.value);};
   document.getElementById('newKey').onclick=function(){
     if(!confirm('لو غيّرت المفتاح، لازم تحدّث الكود في Apps Script وتعمل Deploy من جديد. تكمل؟'))return;
     var k=makeKey();
@@ -195,6 +214,12 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
     try{localStorage.setItem('gift.msgkey',k);}catch(e){}
     paint();
     toast('اتولد مفتاح رسايل جديد');
+  };
+  document.getElementById('newMsgPin').onclick=function(){
+    if(!confirm('لو غيّرت الـPIN، لازم تحدّث الكود في Apps Script وتعمل Deploy من جديد. تكمل؟'))return;
+    try{localStorage.setItem('gift.msgpin',makePin());}catch(e){}
+    paint();
+    toast('اتولد PIN جديد');
   };
   document.getElementById('copyCode').onclick=function(){
     if(!code){toast('الكود لسه بيحمّل');return;}
