@@ -6,7 +6,8 @@
 <title>Hassan &amp; Aya</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cairo:wght@200;300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cairo:wght@200;300;400;600&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="letters.css">
 <script src="config.js"></script>
 <style>
 :root{--gold:#d8b878;--cream:#f8f1e4}
@@ -202,11 +203,38 @@ body.v1 .play .mono i.a{animation:dropL .95s 2.74s cubic-bezier(.2,.62,.3,1.22) 
 @keyframes rise{from{opacity:0;transform:translateY(18px);filter:blur(8px)}to{opacity:1;transform:none;filter:blur(0)}}
 @keyframes names{from{opacity:0;letter-spacing:.16em;filter:blur(16px)}to{opacity:1;letter-spacing:.03em;filter:blur(0)}}
 
-.foot{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:18px;z-index:20}
-.mini{background:none;border:none;font-family:inherit;font-size:11px;letter-spacing:2px;color:rgba(248,241,228,.34);cursor:pointer;transition:.25s}
-.mini:hover{color:rgba(248,241,228,.85)}
+.foot{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);display:flex;gap:14px;z-index:20}
+.ibtn{position:relative;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;cursor:pointer;padding:0;
+  color:rgba(248,241,228,.78);background:rgba(10,14,26,.38);border:1px solid rgba(216,184,120,.3);
+  backdrop-filter:blur(6px);-webkit-tap-highlight-color:transparent;
+  transition:color .35s,border-color .35s,background .35s,transform .2s}
+.ibtn:hover{color:#fff;border-color:rgba(216,184,120,.75);background:rgba(216,184,120,.12)}
+.ibtn:active{transform:scale(.92)}
+.ibtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.ibtn:after{content:"";position:absolute;inset:-1px;border-radius:50%;border:1.5px solid rgba(216,184,120,.8);opacity:0;pointer-events:none}
+.ibtn.rip:after{animation:ripOut .65s ease-out}
+@keyframes ripOut{from{opacity:.9;transform:scale(1)}to{opacity:0;transform:scale(1.9)}}
+.ibtn .tip{position:absolute;bottom:calc(100% + 9px);left:50%;transform:translate(-50%,4px);white-space:nowrap;
+  font-size:10.5px;letter-spacing:1px;padding:4px 11px;border-radius:999px;color:var(--cream);
+  background:rgba(8,12,22,.94);border:1px solid rgba(216,184,120,.3);opacity:0;pointer-events:none;transition:.22s}
+@media (hover:hover){.ibtn:hover .tip,.ibtn:focus-visible .tip{opacity:1;transform:translate(-50%,0)}}
+/* زرار الصوت: موجات بتتحرك، ولما يتكتم الموجات بتختفي وخط مائل بيتم رسمه */
+.snd .wv{transform-box:fill-box;transform-origin:0 50%;animation:wave 1.7s ease-in-out infinite;transition:opacity .3s}
+.snd .w2{animation-delay:.28s}
+@keyframes wave{0%,100%{opacity:.3;transform:scale(.9)}50%{opacity:1;transform:scale(1.08)}}
+.snd .sl{stroke-dasharray:1 1;stroke-dashoffset:1;transition:stroke-dashoffset .5s cubic-bezier(.6,0,.2,1)}
+.snd .sl.bg{stroke:#0a0e1a;stroke-width:4.6}
+.snd.off .sl{stroke-dashoffset:0}
+.snd.off .wv{animation:none;opacity:0}
+.snd.off{color:rgba(248,241,228,.45)}
+.snd.sndpop svg{animation:sndPop .55s cubic-bezier(.3,1.6,.5,1)}
+@keyframes sndPop{0%{transform:scale(1)}35%{transform:scale(.78) rotate(-8deg)}70%{transform:scale(1.14) rotate(4deg)}100%{transform:scale(1)}}
+/* زرار من الأول: سهم دائري بيلف لفة كاملة */
+.rep.spin svg{animation:repSpin .85s cubic-bezier(.5,0,.15,1)}
+@keyframes repSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.rep:hover svg{transform:rotate(-28deg);transition:transform .3s}
 
-.toast{position:absolute;bottom:58px;left:50%;transform:translateX(-50%) translateY(14px);
+.toast{position:absolute;bottom:72px;pointer-events:none;left:50%;transform:translateX(-50%) translateY(14px);
   background:rgba(8,12,22,.9);border:1px solid rgba(216,184,120,.4);color:var(--cream);
   padding:10px 22px;border-radius:999px;font-size:12px;letter-spacing:1px;opacity:0;transition:.4s;z-index:30}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -280,8 +308,9 @@ body.v1 .play .mono i.a{animation:dropL .95s 2.74s cubic-bezier(.2,.62,.3,1.22) 
 #no{font-family:inherit;font-size:13px;letter-spacing:1px;padding:12px 26px;border-radius:999px;cursor:pointer;background:rgba(10,14,26,.25);border:1px solid rgba(248,241,228,.2);color:rgba(248,241,228,.85);backdrop-filter:blur(4px);transition:background .25s,border-color .25s,color .25s}
 #no:hover{border-color:rgba(216,184,120,.5)}
 #no.loose{position:fixed;z-index:40;margin:0;transition:left .13s cubic-bezier(.2,.7,.3,1),top .13s cubic-bezier(.2,.7,.3,1),transform .13s ease;white-space:nowrap;box-shadow:0 12px 30px rgba(0,0,0,.45)}
-.thanks{position:fixed;inset:0;z-index:55;display:grid;place-items:center;padding:20px;
+.thanks{position:fixed;inset:0;z-index:55;overflow-y:auto;padding:0 16px;
   background:rgba(2,3,8,.78);backdrop-filter:blur(6px);opacity:0;visibility:hidden;transition:.4s}
+.thStack{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:22px 0}
 .thanks.on{opacity:1;visibility:visible}
 .thCard{position:relative;width:min(94vw,420px);padding:34px 26px 26px;border-radius:22px;text-align:center;
   background:linear-gradient(180deg,rgba(22,20,26,.97),rgba(9,9,14,.98));
@@ -304,6 +333,59 @@ body.v1 .play .mono i.a{animation:dropL .95s 2.74s cubic-bezier(.2,.62,.3,1.22) 
 .thSync.warn{color:#ffd9a0}
 #thMap{background:rgba(216,184,120,.92);border:1px solid rgba(216,184,120,.92);color:#1a1208}
 #thClose{background:transparent;border:1px solid rgba(248,241,228,.22);color:rgba(248,241,228,.8)}
+
+/* ---------- كارت الرسالة السرية ---------- */
+.msgCard{position:relative;width:min(94vw,420px);padding:22px 18px 18px;border-radius:22px;text-align:center;
+  background:linear-gradient(180deg,rgba(24,20,28,.97),rgba(10,9,15,.98));
+  border:1px solid rgba(216,184,120,.45);box-shadow:0 30px 90px rgba(0,0,0,.7),0 0 80px rgba(216,184,120,.07);
+  opacity:0;transform:translateY(46px) scale(.94)}
+.msgCard[hidden]{display:none}
+.thanks.on .msgCard{animation:msgIn .9s 1.05s cubic-bezier(.2,.85,.3,1.15) both}
+@keyframes msgIn{from{opacity:0;transform:translateY(46px) scale(.94)}to{opacity:1;transform:none}}
+.mcTag{display:inline-block;font-size:11px;letter-spacing:2px;padding:3px 12px;border-radius:999px;color:#ffe9b0;
+  border:1px dashed rgba(216,184,120,.55);background:rgba(216,184,120,.08)}
+.mcTag i{display:inline-block;font-style:normal;animation:shh 2.4s ease-in-out infinite}
+@keyframes shh{0%,100%{transform:rotate(0)}45%{transform:rotate(-14deg) scale(1.15)}55%{transform:rotate(10deg) scale(1.15)}}
+.msgCard h4{font-weight:600;font-size:clamp(17px,4.4vw,20px);color:#fdf6e9;margin:12px 0 4px;line-height:1.5}
+.msgCard .mcSub{font-size:12.5px;line-height:1.8;color:rgba(248,241,228,.6)}
+.mcSw{display:flex;justify-content:center;align-items:center;gap:10px;margin:14px 0 10px}
+.mcSw span{font-size:11px;color:rgba(248,241,228,.45);margin-left:4px;letter-spacing:.5px}
+.mcSw button{width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.12);cursor:pointer;padding:0;
+  background:linear-gradient(145deg,var(--sw1),var(--sw2));transition:transform .25s cubic-bezier(.3,1.6,.5,1),border-color .25s,box-shadow .25s}
+.mcSw button:hover{transform:scale(1.12)}
+.mcSw button.on{border-color:#ffe9b0;transform:scale(1.22);box-shadow:0 0 0 3px rgba(216,184,120,.2),0 0 16px rgba(216,184,120,.35)}
+.mcPaper{position:relative;border-radius:8px;box-shadow:0 10px 24px rgba(0,0,0,.4);overflow:hidden;
+  background:linear-gradient(180deg,var(--p1),var(--p2))}
+.mcPaper:before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(180deg,transparent 0,transparent 27px,var(--ln) 27px,var(--ln) 28px);background-position:0 14px}
+.mcPaper textarea{position:relative;display:block;width:100%;height:132px;resize:none;border:0;outline:none;background:transparent;
+  color:var(--ink);font-family:"Aref Ruqaa","Cairo",serif;font-size:17px;line-height:28px;padding:14px 16px 24px;direction:rtl;text-align:right}
+.mcPaper textarea::placeholder{color:var(--ink);opacity:.42}
+.mcCnt{position:absolute;left:10px;bottom:5px;font-size:10px;letter-spacing:1px;color:var(--ink);opacity:.5;font-family:"Cairo",sans-serif}
+.mcPaper.shake{animation:mcShake .5s}
+@keyframes mcShake{20%,60%{transform:translateX(-7px) rotate(-.6deg)}40%,80%{transform:translateX(7px) rotate(.6deg)}}
+.mcPaper.mcpop{animation:mcPop .35s cubic-bezier(.3,1.6,.5,1)}
+@keyframes mcPop{0%{transform:scale(.97) rotate(-.8deg)}100%{transform:none}}
+.mcSend{margin-top:14px;font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.5px;padding:12px 26px;border-radius:999px;cursor:pointer;
+  background:rgba(216,184,120,.94);border:1px solid rgba(216,184,120,.94);color:#1a1208;display:inline-flex;align-items:center;gap:8px;transition:.25s}
+.mcSend:hover{background:#eccf98;transform:translateY(-1px)}
+.mcSend svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s}
+.mcSend:hover svg{transform:translateX(-4px) rotate(-8deg)}
+.mcSend:disabled{opacity:.55;cursor:wait}
+.mcLine{margin-top:12px;font-size:11.5px;color:rgba(248,241,228,.5);letter-spacing:.3px;min-height:18px}
+.mcLine b{color:#ffe9b0;font-weight:600}
+.mcErr{display:block;margin-top:8px;font-size:11.5px;color:#ffd9a0;min-height:16px}
+.mcStage{margin:10px auto 0;transform-origin:50% 0}
+.mcDone{margin-top:6px}
+.mcDone[hidden]{display:none}
+.mcDone h5{font-weight:600;font-size:15px;color:#fdf6e9;margin-bottom:4px}
+.mcDone p{font-size:12px;line-height:1.8;color:rgba(248,241,228,.6)}
+.mcBtns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.mcBtns button{font-family:inherit;font-size:12px;letter-spacing:1px;padding:9px 18px;border-radius:999px;cursor:pointer;transition:.25s}
+#mcAgain{background:transparent;border:1px solid rgba(216,184,120,.55);color:#ffe9b0}
+#mcAgain:hover{background:rgba(216,184,120,.12)}
+#mcFin{background:transparent;border:1px solid rgba(248,241,228,.22);color:rgba(248,241,228,.8)}
+@media (prefers-reduced-motion:reduce){.thanks.on .msgCard{animation-duration:.01s;animation-delay:0s}}
 body.still .l1,body.still .l2,body.still .l3,body.still .l4,body.still .l5,body.still .l6,body.still .l7,body.still .banner{opacity:1!important;animation:none!important;transform:none!important}
 body.still .mono i{opacity:1!important;animation:none!important;transform:none!important}
 body.still .rule{transform:scaleX(1)!important}
@@ -522,7 +604,149 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
   0%{opacity:0;transform:translate(0,0) scale(.5)}
   18%{opacity:1}
   100%{opacity:0;transform:translate(var(--x),-120px) scale(1.2)}
-}</style>
+}
+/* ======================= v2: افتتاحية + لقاء العرسان + الأسماء + كارت زجاجي + باراالكس ======================= */
+:root{--px:0;--py:0}
+.moon{translate:calc(var(--px)*-22px) calc(var(--py)*-14px)}
+.clouds{translate:calc(var(--px)*-12px) calc(var(--py)*-6px)}
+.horizon{translate:calc(var(--px)*12px) calc(var(--py)*6px)}
+.petals{translate:calc(var(--px)*18px) calc(var(--py)*10px)}
+.frame:before{translate:calc(var(--px)*-34px) calc(var(--py)*-12px)}
+.poster{translate:calc(var(--px)*-9px) calc(var(--py)*-6px)}
+.intro:before{translate:calc(var(--px)*-16px) calc(var(--py)*-12px)}
+.sparks{translate:calc(var(--px)*22px) calc(var(--py)*14px)}
+.introInner{translate:calc(var(--px)*10px) calc(var(--py)*7px)}
+/* الكاميرا بتدخل: الدعوة تقرب من بعيد (من غير filter عشان الزجاج يشتغل) */
+.frame.enter .stage{animation:camIn 2.3s cubic-bezier(.16,.75,.2,1) backwards}
+@keyframes camIn{from{transform:scale(.6);opacity:0}55%{opacity:1}to{transform:scale(1);opacity:1}}
+
+/* ظرف الافتتاحية */
+.envTilt{perspective:900px;transform:perspective(900px) rotateY(calc(var(--px)*11deg)) rotateX(calc(var(--py)*-8deg))}
+.envHost{position:relative;width:320px;height:200px;margin:0 auto;scale:var(--es,1);animation:envFloat 7s ease-in-out infinite;cursor:pointer;filter:drop-shadow(0 28px 40px rgba(0,0,0,.55))}
+.envHost .lt-seal{animation:sealBeat 2.2s ease-in-out infinite}
+@keyframes sealBeat{0%,100%{filter:brightness(1)}50%{filter:brightness(1.28) drop-shadow(0 0 10px rgba(255,110,130,.75))}}
+.icard{position:absolute;left:8%;right:8%;top:12%;bottom:12%;z-index:2;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  background:linear-gradient(180deg,#fcf6ea,#eddfc3);color:#2a1d10;box-shadow:0 10px 26px rgba(0,0,0,.35)}
+.icM{font-family:"Cormorant Garamond",serif;font-size:34px;letter-spacing:.14em}
+.icM i{color:#b08a44;font-style:italic;letter-spacing:0}
+.icD{font-size:9px;letter-spacing:.32em;color:rgba(42,29,16,.55)}
+.icT{position:absolute;left:0;right:0;bottom:16px;z-index:5;text-align:center;font-size:11px;letter-spacing:.5em;color:rgba(70,48,20,.55);padding-right:.5em;pointer-events:none}
+.intro.opening .envHost{animation:none;cursor:default}
+.intro.opening .envHost .lt-seal{animation:none}
+
+/* العريس والعروسة: يمشوا، يتقابلوا، يمسكوا إيد، قلب، وينحنوا ناحية الاسمين */
+.walk{position:relative;gap:0;align-items:flex-end;margin:clamp(30px,5vh,46px) 0 4px;--fw:clamp(58px,8.6vh,104px)}
+.figWrap{width:var(--fw)}
+.figWrap.bride{animation:none;transform:translateX(72vw)}
+.figWrap.groom{animation:none;transform:translateX(-72vw)}
+.play .figWrap.bride{animation:walkR2 2.6s .5s cubic-bezier(.35,.6,.35,1) both}
+.play .figWrap.groom{animation:walkL2 2.6s .5s cubic-bezier(.35,.6,.35,1) both}
+@keyframes walkR2{from{transform:translateX(72vw)}to{transform:translateX(calc(var(--fw)*-.2))}}
+@keyframes walkL2{from{transform:translateX(-72vw)}to{transform:translateX(calc(var(--fw)*.2))}}
+.play .figWrap svg{animation:stepBob .52s ease-in-out .5s 5,bob 2.8s 3.1s ease-in-out infinite}
+.play .figWrap.groom .legL{animation:legSwingA .52s ease-in-out .5s 5 alternate}
+.play .figWrap.groom .legR{animation:legSwingB .52s ease-in-out .5s 5 alternate}
+.play .figWrap .armA{animation:armSwingA .52s ease-in-out .5s 5 alternate}
+.play .figWrap .armB{animation:armSwingB .52s ease-in-out .5s 5 alternate}
+.play .figWrap .dress{animation:dressSway .52s ease-in-out .5s 5 alternate}
+.figWrap .head{transform-box:fill-box;transform-origin:50% 100%}
+.play .figWrap.bride .head{animation:bowB 1.3s 3.8s ease-in-out both}
+.play .figWrap.groom .head{animation:bowG 1.3s 3.8s ease-in-out both}
+@keyframes bowB{to{transform:rotate(-7deg) translateY(2px)}}
+@keyframes bowG{to{transform:rotate(7deg) translateY(2px)}}
+.walk .banner{position:absolute;bottom:calc(100% + 4px);left:0;right:0;margin:0 auto;width:max-content}
+.play .banner{animation:bannerIn .9s 4.4s cubic-bezier(.2,.8,.3,1.25) both,sway 5.5s 5.5s ease-in-out infinite}
+.clasp{position:absolute;left:50%;bottom:calc(var(--fw)*.84);width:calc(var(--fw)*.17);height:calc(var(--fw)*.17);margin-left:calc(var(--fw)*-.085);border-radius:50%;z-index:4;
+  background:radial-gradient(circle at 35% 30%,#f7dcc3,#e2b995);opacity:0;transform:scale(0)}
+.clasp:after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1.5px solid rgba(255,190,205,.85);opacity:0}
+.play .clasp{animation:claspIn .55s 3.1s cubic-bezier(.3,1.7,.5,1) both}
+.play .clasp:after{animation:claspRing 1.1s 3.15s ease-out both}
+@keyframes claspIn{to{opacity:1;transform:scale(1)}}
+@keyframes claspRing{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(3.4)}}
+.hearts{position:absolute;left:50%;bottom:var(--fw);width:0;height:0;z-index:5;pointer-events:none}
+.hearts b{position:absolute;left:0;bottom:0;color:#ff6b8a;font-weight:400;line-height:1;opacity:0;text-shadow:0 0 14px rgba(255,107,138,.6)}
+.hearts b:nth-child(1){font-size:calc(var(--fw)*.46);margin-left:calc(var(--fw)*-.23)}
+.hearts b:nth-child(n+2){font-size:calc(var(--fw)*.2)}
+.play .hearts b:nth-child(1){animation:heartMain 1s 3.3s cubic-bezier(.2,1.5,.4,1) both,heartBeat 1.5s 4.4s ease-in-out infinite}
+@keyframes heartMain{0%{opacity:0;transform:translateY(10px) scale(.2)}100%{opacity:1;transform:translateY(calc(var(--fw)*-.42)) scale(1)}}
+@keyframes heartBeat{0%,100%{opacity:1;transform:translateY(calc(var(--fw)*-.42)) scale(1)}15%{opacity:1;transform:translateY(calc(var(--fw)*-.42)) scale(1.18)}30%{opacity:1;transform:translateY(calc(var(--fw)*-.42)) scale(1)}45%{opacity:1;transform:translateY(calc(var(--fw)*-.42)) scale(1.12)}}
+.play .hearts b:nth-child(2){--x:-34px;animation:heartFloat 2.6s 3.5s ease-out both}
+.play .hearts b:nth-child(3){--x:30px;animation:heartFloat 2.6s 3.8s ease-out both}
+.play .hearts b:nth-child(4){--x:-14px;animation:heartFloat 2.8s 4.2s ease-out both}
+.play .hearts b:nth-child(5){--x:44px;animation:heartFloat 2.6s 4.6s ease-out both}
+@keyframes heartFloat{0%{opacity:0;transform:translate(0,0) scale(.4)}20%{opacity:.95}100%{opacity:0;transform:translate(var(--x),calc(var(--fw)*-1.4)) scale(1)}}
+
+/* الاسمين: بيترسموا بقلم ذهبي وبعدها لمعة */
+.mono .ha{display:block;width:clamp(250px,42vw,470px);height:auto;overflow:visible;filter:drop-shadow(0 22px 40px rgba(0,0,0,.5))}
+.ha text{font-family:"Cormorant Garamond","Times New Roman",serif;font-weight:300}
+.ha .tH{font-size:250px}.ha .tA{font-size:218px}
+.ha .sH,.ha .sA{fill:url(#gHA);fill-opacity:0;stroke:#ead2a0;stroke-width:2.2;stroke-dasharray:2000;stroke-dashoffset:2000;stroke-linejoin:round}
+.ha .glint{opacity:0}
+.play .ha .sH{animation:haDraw 2s 3.8s cubic-bezier(.55,0,.3,1) forwards,haFill 1.1s 5.6s ease forwards}
+.play .ha .sA{animation:haDraw 2s 4.4s cubic-bezier(.55,0,.3,1) forwards,haFill 1.1s 6.2s ease forwards}
+@keyframes haDraw{to{stroke-dashoffset:0}}
+@keyframes haFill{to{fill-opacity:1;stroke-width:1.1}}
+.play .ha .glint{animation:haGlint 1.4s 7.1s ease-in-out both}
+@keyframes haGlint{from{opacity:1;transform:translateX(0) skewX(-18deg)}to{opacity:1;transform:translateX(780px) skewX(-18deg)}}
+body.v1 .play .dateLine{animation:dateIn .9s 5.8s both}
+.play .l3{animation:rise 1.5s 6.1s both}
+.play .l4{animation:rule 1.8s 6.3s cubic-bezier(.6,0,.2,1) forwards}
+.play .l5{animation:riseG 1.4s 6.6s both}
+.play .l7{animation:rise 1.6s 7.3s both}
+@keyframes riseG{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+body.still .ha .sH,body.still .ha .sA{animation:none!important;stroke-dashoffset:0;fill-opacity:1;stroke-width:1.1}
+body.still .figWrap.bride{animation:none!important;transform:translateX(calc(var(--fw)*-.2))!important}
+body.still .figWrap.groom{animation:none!important;transform:translateX(calc(var(--fw)*.2))!important}
+body.still .clasp{animation:none!important;opacity:1;transform:none}
+body.still .hearts b:nth-child(1){animation:none!important;opacity:1;transform:translateY(calc(var(--fw)*-.42))}
+
+/* كارت زجاجي: الموعد + عداد + تقويم */
+.glass{width:min(92vw,370px);margin:20px auto 0;padding:14px 16px 13px;border-radius:20px;position:relative;
+  background:linear-gradient(160deg,rgba(255,255,255,.11),rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.17);box-shadow:0 18px 50px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.22);
+  backdrop-filter:blur(14px) saturate(1.25);-webkit-backdrop-filter:blur(14px) saturate(1.25)}
+.gRow{display:flex;justify-content:center;align-items:center;gap:12px}
+.gRow b{font-weight:400;font-size:clamp(15px,1.9vw,20px);letter-spacing:1.5px;color:#f8edd8}
+.gPlace{margin-top:4px;font-size:12px;letter-spacing:3px;color:rgba(248,241,228,.55);text-align:center}
+.gCd{display:flex;justify-content:center;gap:8px;margin:12px 0 10px;direction:ltr}
+.gCd[hidden],.gMsg[hidden]{display:none}
+.gCd div{flex:1;max-width:76px;padding:7px 4px 6px;border-radius:12px;background:rgba(4,7,14,.38);border:1px solid rgba(216,184,120,.22);text-align:center}
+.gCd b{display:block;font-size:clamp(21px,5.6vw,27px);font-weight:300;color:#ffe9b0;font-family:"Cormorant Garamond","Cairo",serif;font-variant-numeric:tabular-nums;line-height:1.15}
+.gCd span{font-size:9.5px;letter-spacing:2px;color:rgba(248,241,228,.5)}
+.gCd b.tk{animation:tk .35s ease-out}
+@keyframes tk{from{transform:translateY(-5px);opacity:.3}to{transform:none;opacity:1}}
+.gMsg{margin:12px 0 10px;text-align:center;color:#ffe9b0;font-size:15px}
+.gBtn{display:flex;margin:0 auto;align-items:center;gap:8px;font-family:inherit;font-size:12px;letter-spacing:1px;padding:9px 18px;border-radius:999px;cursor:pointer;
+  color:rgba(248,241,228,.92);background:rgba(255,255,255,.07);border:1px solid rgba(216,184,120,.42);transition:.25s}
+.gBtn:hover{background:rgba(216,184,120,.16);border-color:rgba(216,184,120,.85)}
+.gBtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.calOpts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.calOpts[hidden]{display:none}
+.calOpts a{font-size:11.5px;letter-spacing:.5px;padding:7px 14px;border-radius:999px;text-decoration:none;color:#ffe9b0;border:1px dashed rgba(216,184,120,.5);background:rgba(216,184,120,.08)}
+.cta{margin-top:22px}
+@media(max-height:780px){
+  .glass{margin-top:12px;padding:10px 14px 10px}
+  .gCd{margin:8px 0 8px}.gCd div{padding:5px 3px 4px}
+  .invite{margin-top:12px}.rule{margin:10px auto}
+  .cta{margin-top:14px}
+  .mono .ha{width:clamp(200px,40vh,330px)}
+}
+@media(max-height:640px){.gPlace{display:none}.invite{display:none}}
+@media (prefers-reduced-motion:reduce){.envHost,.envHost .lt-seal{animation:none}}
+
+/* v2.1: ضبط الارتفاعات الصغيرة + قايمة التقويم عايمة */
+.calOpts{position:absolute;left:12px;right:12px;top:calc(100% + 8px);z-index:9;margin:0;padding:10px;border-radius:14px;
+  background:rgba(8,12,22,.94);border:1px solid rgba(216,184,120,.3);box-shadow:0 14px 34px rgba(0,0,0,.55)}
+.poster{padding-bottom:56px}
+.glass{z-index:30}
+@media(max-height:760px){
+  .walk{--fw:clamp(50px,7vh,88px);margin-top:clamp(26px,4vh,40px)}
+  .mono .ha{width:clamp(180px,34vh,300px)}
+  .glass{margin-top:8px}
+  .cta{margin-top:12px}
+}
+@media(max-height:680px){.mono .ha{width:clamp(160px,30vh,250px)}.dateLine{display:none}}
+</style>
 </head>
 <body>
 <div class="frame" id="frame">
@@ -546,9 +770,9 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
               <path d="M37 111c-10 19-15 45-17 67h80c-2-22-7-48-17-67z" fill="#fbf8f1"/>
               <path d="M37 111c-10 19-15 45-17 67h80c-2-22-7-48-17-67z" fill="none" stroke="rgba(216,184,120,.35)" stroke-width="1"/>
             </g>
-            <circle cx="60" cy="51" r="15" fill="#f3d3b5"/>
+            <g class="head"><circle cx="60" cy="51" r="15" fill="#f3d3b5"/>
             <path d="M45 49c0-11 7-18 15-18s15 7 15 18c-3-6-8-9-15-9s-12 3-15 9z" fill="#3a2a24"/>
-            <path d="M47 36c4-7 8-10 13-10s9 3 13 10" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M47 36c4-7 8-10 13-10s9 3 13 10" stroke="rgba(255,255,255,.55)" stroke-width="2" fill="none" stroke-linecap="round"/></g>
             <path d="M60 60l-7 10v34h14V70z" fill="#e9dfd0"/>
             <g class="arm armA"><path d="M46 92c-8-1-16 2-22 8" stroke="#f3d3b5" stroke-width="6" stroke-linecap="round" fill="none"/></g>
             <path d="M70 118v22" stroke="#5c7a4c" stroke-width="2"/>
@@ -570,16 +794,27 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
             <path d="M60 66l-8 13v39h16V79z" fill="#f7f2e8"/>
             <path d="M60 80l-3 6 3 21 3-21z" fill="#8c2f3d"/>
             <path d="M52 68l8 11 8-11" fill="none" stroke="rgba(216,184,120,.4)" stroke-width="1.5"/>
-            <circle cx="60" cy="48" r="15" fill="#e8c3a2"/>
-            <path d="M45 46c0-11 7-18 15-18s15 7 15 18c-3-6-8-9-15-9s-12 3-15 9z" fill="#241a17"/>
+            <g class="head"><circle cx="60" cy="48" r="15" fill="#e8c3a2"/>
+            <path d="M45 46c0-11 7-18 15-18s15 7 15 18c-3-6-8-9-15-9s-12 3-15 9z" fill="#241a17"/></g>
             <g class="arm armB"><path d="M74 92c8-1 16 2 22 8" stroke="#e8c3a2" stroke-width="6" stroke-linecap="round" fill="none"/></g>
           </svg>
         </div>
+        <span class="clasp" aria-hidden="true"></span>
+        <div class="hearts" aria-hidden="true"><b>♥</b><b>♥</b><b>♥</b><b>♥</b><b>♥</b></div>
       </div>
 
       <h1 class="l2 names">
         <span class="combo">
-          <span class="mono"><i class="h">H</i><i class="a">A</i></span>
+          <span class="mono"><svg class="ha" viewBox="0 0 540 250" role="img" aria-label="H A">
+            <defs>
+              <linearGradient id="gHA" x1="0" y1="0" x2="0" y2="1"><stop offset=".1" stop-color="#fffaf0"/><stop offset=".55" stop-color="#f6e7c6"/><stop offset=".95" stop-color="#d9bb85"/></linearGradient>
+              <linearGradient id="gGl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+              <clipPath id="cHA"><text class="tH" x="185" y="205" text-anchor="middle">H</text><text class="tA" x="360" y="205" text-anchor="middle">A</text></clipPath>
+            </defs>
+            <text class="sH tH" x="185" y="205" text-anchor="middle">H</text>
+            <text class="sA tA" x="360" y="205" text-anchor="middle">A</text>
+            <rect class="glint" x="-160" y="0" width="130" height="250" fill="url(#gGl)" clip-path="url(#cHA)"/>
+          </svg></span>
 
           <span class="dateLine"><i></i>18 · 11 · 2026<i></i></span>
           <span class="word first">Hassan</span>
@@ -589,13 +824,19 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
       </h1>
       <p class="l3 invite">بيقولولكم تعالوا تفرحوا معانا</p>
       <div class="l4 rule"></div>
-      <div class="l5 when">
-        <span>الأربعاء</span>
-        <b>١٨ نوفمبر</b>
-        <span class="dot"></span>
-        <b>٨ مساءً</b>
+      <div class="l5 glass" id="detail">
+        <div class="gRow"><b>الأربعاء ١٨ نوفمبر</b><span class="dot"></span><b>٨ مساءً</b></div>
+        <div class="gPlace">ليلة العمر &nbsp;·&nbsp; عزبة النخل</div>
+        <div class="gCd" id="gCd" dir="ltr">
+          <div><b id="cdD">٠٠</b><span>يوم</span></div>
+          <div><b id="cdH">٠٠</b><span>ساعة</span></div>
+          <div><b id="cdM">٠٠</b><span>دقيقة</span></div>
+          <div><b id="cdS">٠٠</b><span>ثانية</span></div>
+        </div>
+        <div class="gMsg" id="gMsg" hidden></div>
+        <button class="gBtn" id="calBtn" type="button" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="M12 14v4M10 16h4"/></svg><span>أضف للتقويم</span></button>
+        <div class="calOpts" id="calOpts" hidden><a id="calG" href="#" target="_blank" rel="noopener">Google Calendar</a><a id="calI" href="#" download="hassan-aya-wedding.ics">ملف التقويم (.ics)</a></div>
       </div>
-      <div class="l6 where">ليلة العمر &nbsp;·&nbsp; عزبة النخل</div>
       <div class="l7 cta">
         <button id="rsvp">أكيد جاي</button>
         <button id="no">مش هعرف أجي</button>
@@ -607,11 +848,24 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
   <div class="toast" id="toast">تم، مستنيينك يا صاحبي</div>
   <div class="roses" id="roses"></div>
   <div class="foot">
-    <button class="mini" id="mute">الصوت شغال</button>
-    <button class="mini" id="replay">من الأول</button>
+    <button class="ibtn snd" id="mute" type="button" aria-label="كتم الصوت" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6a1.4 1.4 0 0 1-1 .4H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5z"/>
+        <path class="wv w1" d="M16 9a5 5 0 0 1 0 6"/>
+        <path class="wv w2" d="M19.4 18.4a9 9 0 0 0 0-12.8"/>
+        <line class="sl bg" x1="3.2" y1="3.2" x2="20.8" y2="20.8" pathLength="1"/>
+        <line class="sl fg" x1="3.2" y1="3.2" x2="20.8" y2="20.8" pathLength="1"/>
+      </svg>
+      <span class="tip" id="muteTip">كتم الصوت</span>
+    </button>
+    <button class="ibtn rep" id="replay" type="button" aria-label="من الأول">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.9 1 6.7 2.7L21 8"/><path d="M21 3v5h-5"/></svg>
+      <span class="tip">من الأول</span>
+    </button>
   </div>
 
   <div class="thanks" id="thanks" aria-hidden="true">
+   <div class="thStack" id="thStack">
     <div class="thCard">
       <div class="thRose">🌹</div>
       <div class="thKicker">تم التسجيل</div>
@@ -628,6 +882,34 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
       </div>
       <small class="thSync" id="thSync"></small>
     </div>
+
+    <div class="msgCard" id="msgCard" hidden>
+      <span class="mcTag"><i>🤫</i> سر بينّا</span>
+      <h4>سيب رسالة للعريس والعروسة</h4>
+      <p class="mcSub">ومش هيشوفوها غير <b>بعد الفرح</b>… الصندوق متقفّل والمفتاح معاهم بس 😄</p>
+
+      <div class="mcForm" id="mcForm">
+        <div class="mcSw" id="mcSw"><span>لون الورقة</span></div>
+        <div class="mcPaper" id="mcPaper">
+          <textarea id="mcText" maxlength="300" rows="4" placeholder="اكتب اللي نفسك تقوله…"></textarea>
+          <span class="mcCnt" id="mcCnt">٠ / ٣٠٠</span>
+        </div>
+        <button class="mcSend" id="mcSend" type="button">
+          <span>حطّها في الصندوق</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+        </button>
+        <small class="mcErr" id="mcErr"></small>
+        <div class="mcLine" id="mcLine"></div>
+      </div>
+
+      <div class="mcStage" id="mcStage" hidden></div>
+      <div class="mcDone" id="mcDone" hidden>
+        <h5>اتحطت في الصندوق 🔒</h5>
+        <p id="mcDoneTxt">هتفضل مقفولة لحد بعد الفرح. سرك في أمان 😉</p>
+        <div class="mcBtns"><button id="mcAgain" type="button">اكتب رسالة تانية</button><button id="mcFin" type="button">تمام</button></div>
+      </div>
+    </div>
+   </div>
   </div>
 
   <div class="intro" id="intro">
@@ -647,16 +929,7 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
       </div>
 
       <div class="envStage" aria-hidden="true">
-        <div class="env" id="envBox">
-          <div class="envCard"><span class="envMono">H <i>&amp;</i> A</span><span class="envDate">18 · 11 · 2026</span></div>
-          <div class="envBody"></div>
-          <div class="envInside"></div>
-          <div class="envCast" id="envCast"><div class="castInner" id="castInner"></div></div>
-          <div class="envFront" aria-hidden="true"><span class="half l"></span><span class="half r"></span><span class="seam"></span><span class="envMark">H <i>&amp;</i> A</span></div>
-          <div class="envFlap"></div>
-          <span class="envMouth"></span>
-          <div class="pop" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-        </div>
+        <div class="envTilt"><div class="envHost" id="envHost"></div></div>
         <div class="iHint">دوس تفتح</div>
       </div>
 
@@ -666,6 +939,7 @@ body.freeze3 .envCast .banner,body.freeze4 .envCast .banner,body.freeze5 .envCas
   </div>
 </div>
 
+<script src="letters.js"></script>
 <script>
 const clouds=document.getElementById('clouds');
 for(let i=0;i<4;i++){
@@ -929,13 +1203,22 @@ let muted=false;
 const muteBtn=document.getElementById('mute');
 function playZagh(){
   if(muted) return;
-  try{zagh.currentTime=0;zagh.volume=0.55;zagh.play().catch(()=>{});}catch(e){}
+  try{zagh.currentTime=0;zagh.volume=0.55;zagh.play().catch(()=>{});duckMusic(true);}catch(e){}
 }
+zagh.addEventListener('ended',()=>duckMusic(false));
+const muteTip=document.getElementById('muteTip');
+function ripple(b){b.classList.remove('rip');void b.offsetWidth;b.classList.add('rip');}
 muteBtn.onclick=(e)=>{
   e.stopPropagation();
   muted=!muted;
-  if(muted){try{zagh.pause();}catch(e){}}
-  muteBtn.textContent=muted?'الصوت مقفول':'الصوت شغال';
+  if(window.LET)LET.muted=muted;
+  if(muted){try{zagh.pause();}catch(err){}stopMusic();}else if(musicWanted){startMusic();}
+  muteBtn.classList.toggle('off',muted);
+  muteBtn.setAttribute('aria-pressed',muted?'true':'false');
+  const lbl=muted?'تشغيل الصوت':'كتم الصوت';
+  muteBtn.setAttribute('aria-label',lbl);muteTip.textContent=lbl;
+  muteBtn.classList.remove('sndpop');void muteBtn.offsetWidth;muteBtn.classList.add('sndpop');
+  ripple(muteBtn);
 };
 
 const frameEl=document.getElementById('frame'),poster=document.getElementById('poster');
@@ -949,12 +1232,105 @@ for(let i=0;i<18;i++){
   sp.style.animationDelay=(-Math.random()*7).toFixed(2)+'s';
   sparks.appendChild(sp);
 }
-const castInner=document.getElementById('castInner');
-const __m=(new URLSearchParams(location.search).get('intro')||'').toLowerCase();
-if(!(__m==='star'||__m==='1')){
-  const srcWalk=document.querySelector('.walk');
-  if(srcWalk&&castInner){const c=srcWalk.cloneNode(true);c.removeAttribute('id');castInner.appendChild(c);}
+/* ================= موسيقى هادية (WebAudio، من غير ملفات) ================= */
+let musicOn=false,musicWanted=false,mGain=null,mBus=null,mSend=null,mTimer=null,mNext=0,mStep=0,mDuck=false;
+const MCH=[
+  {b:36,p:[52,55,59,64],a:[72,76,79,83,79,76]},
+  {b:33,p:[48,52,55,60],a:[69,72,76,81,76,72]},
+  {b:41,p:[48,53,57,60],a:[72,69,65,69,72,77]},
+  {b:43,p:[50,55,59,62],a:[74,71,67,71,74,79]}
+];
+const mtof=n=>440*Math.pow(2,(n-69)/12);
+function musicInit(){
+  if(mGain||!AC)return;
+  mGain=AC.createGain();mGain.gain.value=0;mGain.connect(AC.destination);
+  mBus=AC.createGain();mBus.gain.value=1;mBus.connect(mGain);
+  const conv=AC.createConvolver(),len=Math.floor(AC.sampleRate*3.4),buf=AC.createBuffer(2,len,AC.sampleRate);
+  for(let c=0;c<2;c++){const d=buf.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.4);}
+  conv.buffer=buf;mSend=AC.createGain();mSend.gain.value=.55;mSend.connect(conv);
+  const rg=AC.createGain();rg.gain.value=.7;conv.connect(rg);rg.connect(mGain);
 }
+function mPad(f,t,dur){
+  [-7,6].forEach(det=>{
+    const o=AC.createOscillator(),g=AC.createGain(),lp=AC.createBiquadFilter();
+    o.type='triangle';o.frequency.value=f;o.detune.value=det;lp.type='lowpass';lp.frequency.value=950;
+    g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(0.032,t+1.9);g.gain.linearRampToValueAtTime(0.026,t+dur);g.gain.linearRampToValueAtTime(0.0001,t+dur+2.4);
+    o.connect(lp);lp.connect(g);g.connect(mBus);g.connect(mSend);o.start(t);o.stop(t+dur+2.5);
+  });
+}
+function mBass(f,t,dur){
+  const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;
+  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(0.07,t+.5);g.gain.linearRampToValueAtTime(0.0001,t+dur+.8);
+  o.connect(g);g.connect(mBus);o.start(t);o.stop(t+dur+.9);
+}
+function mPluck(f,t){
+  [[f,'sine',.05],[f*2,'triangle',.012]].forEach(x=>{
+    const o=AC.createOscillator(),g=AC.createGain();o.type=x[1];o.frequency.value=x[0];
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(x[2],t+.012);g.gain.exponentialRampToValueAtTime(0.0001,t+1.7);
+    o.connect(g);g.connect(mBus);g.connect(mSend);o.start(t);o.stop(t+1.75);
+  });
+}
+function mTick(){
+  if(!musicOn||!AC)return;
+  const STEP=.52,PER=12;
+  while(mNext<AC.currentTime+.35){
+    const ci=Math.floor(mStep/PER)%MCH.length,ch=MCH[ci],k=mStep%PER;
+    if(k===0){ch.p.forEach((n,i)=>mPad(mtof(n),mNext+i*.12,PER*STEP));mBass(mtof(ch.b),mNext,PER*STEP);}
+    if(k%2===0||Math.random()<.35){if(Math.random()<.82)mPluck(mtof(ch.a[(k>>1)%ch.a.length]),mNext+(Math.random()*.03));}
+    mNext+=STEP;mStep++;
+  }
+}
+function startMusic(){
+  musicWanted=true;
+  if(muted||musicOn)return;
+  if(!ac())return;
+  musicInit();musicOn=true;
+  const t=AC.currentTime;mGain.gain.cancelScheduledValues(t);mGain.gain.setValueAtTime(mGain.gain.value,t);
+  mGain.gain.linearRampToValueAtTime(mDuck?.25:.9,t+3.5);
+  mNext=t+.1;if(!mTimer)mTimer=setInterval(mTick,120);mTick();
+}
+function stopMusic(){
+  if(!mGain||!AC){musicOn=false;return;}
+  const t=AC.currentTime;mGain.gain.cancelScheduledValues(t);mGain.gain.setValueAtTime(mGain.gain.value,t);mGain.gain.linearRampToValueAtTime(0,t+.45);
+  musicOn=false;clearInterval(mTimer);mTimer=null;
+}
+function duckMusic(on){
+  mDuck=on;if(!mGain||!AC||!musicOn)return;
+  const t=AC.currentTime;mGain.gain.cancelScheduledValues(t);mGain.gain.setValueAtTime(mGain.gain.value,t);
+  mGain.gain.linearRampToValueAtTime(on?.22:.9,t+(on?.5:2.2));
+  if(on){clearTimeout(duckMusic._t);duckMusic._t=setTimeout(()=>duckMusic(false),9000);}
+}
+
+/* ================= باراالكس (ماوس / ميل الموبايل) ================= */
+const PAR={tx:0,ty:0,cx:0,cy:0},rootEl=document.documentElement;
+const parClamp=v=>Math.max(-1,Math.min(1,v));
+if(!window.matchMedia||!matchMedia('(prefers-reduced-motion: reduce)').matches){
+  document.addEventListener('mousemove',e=>{PAR.tx=parClamp(e.clientX/window.innerWidth*2-1);PAR.ty=parClamp(e.clientY/window.innerHeight*2-1);});
+  window.addEventListener('deviceorientation',e=>{if(e.gamma==null)return;PAR.tx=parClamp(e.gamma/22);PAR.ty=parClamp(((e.beta||45)-45)/22);});
+  (function parLoop(){
+    PAR.cx+=(PAR.tx-PAR.cx)*.07;PAR.cy+=(PAR.ty-PAR.cy)*.07;
+    rootEl.style.setProperty('--px',PAR.cx.toFixed(3));rootEl.style.setProperty('--py',PAR.cy.toFixed(3));
+    requestAnimationFrame(parLoop);
+  })();
+}
+function askMotion(){
+  try{if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function')DeviceOrientationEvent.requestPermission().catch(()=>{});}catch(e){}
+}
+
+/* ================= ظرف الافتتاحية (ختم شمعي يتكسر) ================= */
+let introEnv=null,introCard=null;
+(function buildIntroEnv(){
+  const host=document.getElementById('envHost');if(!host||!window.LET)return;
+  const fit=()=>{host.style.setProperty('--es',Math.min(1.15,(window.innerWidth-44)/320,(window.innerHeight*.5)/220).toFixed(3));};
+  fit();window.addEventListener('resize',fit);
+  introEnv=LET.envelope({w:320,h:200,theme:'cream',seal:64});
+  introEnv.el.style.left='0';introEnv.el.style.top='0';introEnv.setFlapOpen(false);introEnv.sealShow();
+  introCard=document.createElement('div');introCard.className='icard';
+  introCard.innerHTML='<span class="icM">H <i>&amp;</i> A</span><span class="icD">18 · 11 · 2026</span>';
+  introEnv.el.appendChild(introCard);
+  const tx=document.createElement('div');tx.className='icT';tx.textContent='دعوة فرح';introEnv.el.appendChild(tx);
+  host.appendChild(introEnv.el);
+})();
 function play(){
   frameEl.classList.remove('play');
   void frameEl.offsetWidth;
@@ -963,35 +1339,44 @@ function play(){
 }
 function openInvite(){
   if(intro.classList.contains('gone')||intro.classList.contains('opening')) return;
-  const isEnv=document.body.classList.contains('intro-env');
+  const isEnv=document.body.classList.contains('intro-env')&&introEnv;
   intro.classList.add('opening');
-  ac();sPaper('open');
+  ac();sPaper('open');askMotion();
   if(!isEnv){
     frameEl.classList.add('enter');
-    play();playZagh();
+    play();startMusic();
     setTimeout(()=>{intro.classList.add('gone');},700);
     setTimeout(()=>{intro.style.display='none';},1900);
     launch(W*0.2,'#7ef2a8');launch(W*0.5,'#ffd9a0');launch(W*0.82,'#ff6b6b');
     return;
   }
-  const cast=document.getElementById('envCast');
   const S=parseFloat(qs.get('slow')||'1')||1;
   const at=(ms,fn)=>setTimeout(fn,ms*S);
-  at(520,()=>{cast.classList.add('rise');sPaper('rustle');});
-  at(1200,()=>{frameEl.classList.add('enter');});
-  at(1260,()=>{play();});
-  at(1420,()=>{cast.classList.add('walk');sPaper('rustle');});
-  at(2020,()=>{intro.classList.add('crack');sPaper('tear');});
-  at(2180,()=>{intro.classList.add('tear');launch(W*0.3,'#ffe1a8');launch(W*0.7,'#ffd9a0');playZagh();});
-  at(2360,()=>{intro.classList.add('gone');});
-  at(3520,()=>{intro.style.display='none';});
+  const inner=document.querySelector('.introInner');
+  LET.muted=muted;LET.sfx.unlock();
+  introEnv.sealBreak();                                         /* 1) الختم يتكسر */
+  startMusic();
+  at(260,()=>{introEnv.glow(true,700);introEnv.flapTo(true,620);});        /* 2) اللسان يتفتح */
+  at(900,()=>{LET.A(introCard,[{transform:'translateY(0)'},{transform:'translateY(-74%) scale(1.04)'}],950,'cubic-bezier(.2,.7,.2,1)');
+              launch(W*0.3,'#ffe1a8');launch(W*0.7,'#ffd9a0');});            /* 3) الكارت يطلع */
+  at(1750,()=>{intro.classList.add('tear');                                  /* 4) الكاميرا تدخل جوه */
+    LET.A(inner,[{transform:'scale(1)',opacity:1},{transform:'scale(5.2)',opacity:0}],1300,'cubic-bezier(.62,0,.9,.45)');});
+  at(1950,()=>{frameEl.classList.add('enter');play();});
+  at(2900,()=>{intro.classList.add('gone');});
+  at(4100,()=>{intro.style.display='none';});
 }
 document.getElementById('openBtn').addEventListener('click',(e)=>{e.stopPropagation();openInvite();});
 intro.addEventListener('click',openInvite);
 
-document.getElementById('replay').onclick=()=>{ac();play();playZagh();};
+const repBtn=document.getElementById('replay');
+repBtn.onclick=(e)=>{
+  e.stopPropagation();
+  repBtn.classList.remove('spin');void repBtn.offsetWidth;repBtn.classList.add('spin');
+  ripple(repBtn);
+  ac();play();startMusic();
+};
 document.addEventListener('pointerdown',()=>{ac();},{capture:true});
-if(new URLSearchParams(location.search).get('skip')==='1'){intro.style.display='none';play();}
+if(new URLSearchParams(location.search).get('skip')==='1'){intro.style.display='none';play();document.addEventListener('pointerdown',()=>{ac();if(!muted)startMusic();},{once:true});}
 if(new URLSearchParams(location.search).get('still')==='1'){document.body.classList.add('still');}
 if(new URLSearchParams(location.search).get('auto')==='1'){setTimeout(openInvite,350);}
 
@@ -1057,14 +1442,6 @@ noBtn.addEventListener('touchstart',(e)=>{e.preventDefault();e.stopPropagation()
 const thanks=document.getElementById('thanks');
 const qs=new URLSearchParams(location.search);
 if(qs.get('debug')==='1'){window.addEventListener('error',e=>{document.title='ERR:'+e.message;});}
-const fz=qs.get('freeze');
-if(fz){
-  document.body.classList.add('freeze','freeze'+fz);
-  if(+fz>=2){intro.classList.add('opening');document.getElementById('envCast').classList.add('rise');}
-  if(+fz>=3){document.getElementById('envCast').classList.add('walk');}
-  if(+fz>=4){intro.classList.add('crack');}
-  if(+fz>=5){intro.classList.add('tear','gone');frameEl.classList.add('play');document.body.classList.add('still');}
-}
 const guest=(qs.get('name')||'').trim();
 const greetEl=document.getElementById('greet');
 if(greetEl)greetEl.textContent=guest?('أهلًا يا '+guest):'أهلًا بيك';
@@ -1131,8 +1508,9 @@ try{
 }catch(e){}
 const introMode=(qs.get('intro')||'').toLowerCase();
 const useStar=(introMode==='star'||introMode==='1');
-if(!useStar)document.body.classList.add('intro-env','no-walk');
-function closeThanks(){thanks.classList.remove('on');thanks.setAttribute('aria-hidden','true');}
+if(!useStar)document.body.classList.add('intro-env');
+let mcBusy=false;
+function closeThanks(){if(mcBusy)return;thanks.classList.remove('on');thanks.setAttribute('aria-hidden','true');}
 yesBtn.onclick=(e)=>{
   e.stopPropagation();
   document.getElementById('thTitle').textContent=guest?('تمام يا '+guest+' ✅'):'تمام يا صاحبي ✅';
@@ -1156,12 +1534,107 @@ if(qs.get('test')==='1'){
     try{ac();sBoom(200);sLaunch(300);document.documentElement.setAttribute('data-audio','ok');}catch(err){document.documentElement.setAttribute('data-audio','ERR:'+err.message);}
   },1600);
 }
-thanks.addEventListener('click',(e)=>{if(e.target===thanks)closeThanks();});
+thanks.addEventListener('click',(e)=>{if(e.target===thanks||e.target.id==='thStack')closeThanks();});
 
-document.addEventListener('mousemove',(e)=>{
-  const x=(e.clientX/window.innerWidth-.5),y=(e.clientY/window.innerHeight-.5);
-  poster.style.transform='translate3d('+(x*-8)+'px,'+(y*-6)+'px,0)';
-});
+
+/* =====================  رسالة سرية للعرسان (بتتفتح بعد الفرح)  ===================== */
+const mc={
+  card:document.getElementById('msgCard'),form:document.getElementById('mcForm'),stage:document.getElementById('mcStage'),
+  done:document.getElementById('mcDone'),doneTxt:document.getElementById('mcDoneTxt'),text:document.getElementById('mcText'),
+  cnt:document.getElementById('mcCnt'),send:document.getElementById('mcSend'),sw:document.getElementById('mcSw'),
+  paper:document.getElementById('mcPaper'),err:document.getElementById('mcErr'),line:document.getElementById('mcLine'),
+  again:document.getElementById('mcAgain'),fin:document.getElementById('mcFin')
+};
+const MC_KEY=(inviteId||guest||'guest');
+const MC_MAX=5;                                     /* أقصى عدد رسايل للضيف الواحد */
+let mcTheme='cream',mcTotal=null,mcMine=0;
+try{mcMine=parseInt(localStorage.getItem('gift.msgmine.'+MC_KEY)||'0',10)||0;}catch(e){}
+const mcAr=n=>{try{return Number(n).toLocaleString('ar-EG');}catch(e){return String(n);}};
+if(rsvpUrl&&!inviteId&&mc.card){mc.card.remove();}   /* لينك عام من غير كود ضيف: مفيش صندوق */
+const mcHolders=['اكتب اللي نفسك تقوله…','نصيحة، دعوة حلوة، أو فضيحة قديمة 😄','قولهم إيه اللي في قلبك…','هما مش هيقروها غير بعد الفرح، خد راحتك 🤭'];
+let mcPh=0;
+if(mc.card){
+  Object.keys(LET.themes).forEach((k,i)=>{
+    const t=LET.themes[k],b=document.createElement('button');
+    b.type='button';b.title=t.n;b.dataset.c=k;b.setAttribute('aria-label','ورقة '+t.n);
+    b.style.setProperty('--sw1',t.p1);b.style.setProperty('--sw2',t.e2);
+    if(k===mcTheme)b.classList.add('on');
+    b.onclick=(e)=>{e.stopPropagation();mcSetTheme(k);};
+    mc.sw.appendChild(b);
+  });
+  LET.theme(mc.paper,mcTheme);
+  setInterval(()=>{if(!mc.text.value&&document.activeElement!==mc.text){mcPh=(mcPh+1)%mcHolders.length;mc.text.placeholder=mcHolders[mcPh];}},3600);
+}
+function mcSetTheme(k){
+  mcTheme=k;LET.theme(mc.paper,k);
+  mc.sw.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===k));
+  mc.paper.classList.remove('mcpop');void mc.paper.offsetWidth;mc.paper.classList.add('mcpop');
+  if(window.LET)LET.sfx.tick();
+}
+function mcLine(){
+  if(!mc.line)return;
+  const n=(mcTotal!=null)?mcTotal:mcMine;
+  mc.line.innerHTML=n>0?('الصندوق فيه <b>'+mcAr(n)+'</b> '+(n>=3&&n<=10?'رسايل':'رسالة')+' لحد دلوقتي 💌'):'كن أول واحد يحط رسالة في الصندوق 💌';
+}
+if(mc.card){
+  mc.text.addEventListener('input',()=>{mc.cnt.textContent=mcAr(mc.text.value.length)+' / '+mcAr(300);mc.err.textContent='';});
+  mc.cnt.textContent=mcAr(0)+' / '+mcAr(300);
+  mc.card.addEventListener('click',e=>e.stopPropagation());
+  /* جيب عدد الرسايل الحالي من الشيت (من غير ما نقرا الرسايل نفسها) */
+  yesBtn.addEventListener('click',()=>{
+    mcLine();
+    if(rsvpUrl)giftJsonp({action:'msgcount'}).then(r=>{if(r&&r.ok){mcTotal=r.count|0;mcLine();}});
+    else{try{mcTotal=(JSON.parse(localStorage.getItem('gift.demo.msgs')||'[]')).length;}catch(e){mcTotal=0;}mcLine();}
+    mc.card.hidden=false;
+  });
+}
+async function mcSubmit(text,theme){
+  if(!rsvpUrl){                                       /* وضع تجريبي: بنخزن في المتصفح بس */
+    await LET.sleep(300);
+    try{const k='gift.demo.msgs',a=JSON.parse(localStorage.getItem(k)||'[]');a.push({name:guest||'ضيف',text:text,c:theme,t:Date.now()});localStorage.setItem(k,JSON.stringify(a));}catch(e){}
+    return {ok:true,count:(mcTotal||0)+1};
+  }
+  return giftJsonp({action:'msg',id:inviteId,name:guest,text:text,c:theme});
+}
+function mcShowForm(){
+  mc.stage.hidden=true;mc.done.hidden=true;mc.form.hidden=false;
+  mc.text.value='';mc.cnt.textContent=mcAr(0)+' / '+mcAr(300);mc.err.textContent='';mc.send.disabled=false;mcLine();
+}
+async function mcGo(){
+  if(mcBusy)return;
+  const text=mc.text.value.trim();
+  if(!text){mc.paper.classList.remove('shake');void mc.paper.offsetWidth;mc.paper.classList.add('shake');mc.text.focus();return;}
+  if(mcMine>=MC_MAX&&rsvpUrl){mc.err.textContent='كده كفاية يا نجم 😂 — '+mcAr(MC_MAX)+' رسايل بالكتير';return;}
+  mcBusy=true;mc.send.disabled=true;mc.err.textContent='';
+  if(window.LET){LET.muted=muted;LET.sfx.unlock();}
+  mc.form.hidden=true;mc.done.hidden=true;mc.stage.hidden=false;
+  try{mc.card.scrollIntoView({behavior:'smooth',block:'center'});}catch(e){}
+  const pending=mcSubmit(text,mcTheme);
+  let r;
+  try{
+    r=await LET.send(mc.stage,{text:text,theme:mcTheme,from:guest,count:(mcTotal!=null?mcTotal:mcMine),getResult:()=>pending});
+  }catch(err){r={ok:false,error:'anim'};}
+  mcBusy=false;
+  if(r&&r.ok){
+    mcTotal=r.count;mcMine++;
+    try{localStorage.setItem('gift.msgmine.'+MC_KEY,String(mcMine));}catch(e){}
+    mc.doneTxt.textContent=mcMine>=MC_MAX&&rsvpUrl?'كده ملّيت الصندوق 😄 هتفضل مقفولة لحد بعد الفرح.':'هتفضل مقفولة لحد بعد الفرح، والعرسان هيفتحوها بالدور. سرك في أمان 😉';
+    mc.again.style.display=(mcMine>=MC_MAX&&rsvpUrl)?'none':'';
+    mc.done.hidden=false;
+    try{mc.card.scrollIntoView({behavior:'smooth',block:'end'});}catch(e){}
+  }else{
+    const code=r&&r.error;
+    const m={limit:'كده كفاية يا نجم 😂 رسايلك خلصت',unknown_guest:'اللينك ده مش متسجل عندنا',timeout:'النت تقيل، جرّب تاني',network:'مفيش اتصال، جرّب تاني',empty:'اكتب حاجة الأول'};
+    mcShowForm();mc.text.value=text;mc.cnt.textContent=mcAr(text.length)+' / '+mcAr(300);
+    mc.err.textContent=(m[code]||'الرسالة ماتبعتتش، جرّب تاني')+' 🙏';
+  }
+}
+if(mc.card){
+  mc.send.onclick=(e)=>{e.stopPropagation();mcGo();};
+  mc.again.onclick=(e)=>{e.stopPropagation();mcShowForm();try{mc.card.scrollIntoView({behavior:'smooth',block:'center'});}catch(err){}setTimeout(()=>mc.text.focus(),400);};
+  mc.fin.onclick=(e)=>{e.stopPropagation();closeThanks();};
+}
+
 
 const __v=parseInt(new URLSearchParams(location.search).get('v'),10);
 const variant=(__v>=1&&__v<=5)?String(__v):'1';
@@ -1181,6 +1654,47 @@ if(variant==='5'){
     });
   });
 }
+
+/* ================= كارت التفاصيل: عداد تنازلي + أضف للتقويم ================= */
+(function(){
+  const START=Date.parse('2026-11-18T20:00:00+02:00'),END=Date.parse('2026-11-18T23:59:00+02:00');
+  const ids=['cdD','cdH','cdM','cdS'].map(i=>document.getElementById(i)),box=document.getElementById('gCd'),msg=document.getElementById('gMsg');
+  const f2=n=>{try{return Number(n).toLocaleString('ar-EG',{minimumIntegerDigits:2,useGrouping:false});}catch(e){return String(n).padStart(2,'0');}};
+  const last=['','','',''];
+  function tick(){
+    const ms=START-Date.now();
+    if(ms<=0){
+      box.hidden=true;msg.hidden=false;
+      msg.textContent=Date.now()<END?'النهاردة الفرح 🎉 مستنيينك':'ألف مبروك يا عرسان 💛';return;
+    }
+    const s=Math.floor(ms/1000),v=[Math.floor(s/86400),Math.floor(s%86400/3600),Math.floor(s%3600/60),s%60].map(f2);
+    v.forEach((t,i)=>{if(last[i]!==t){last[i]=t;ids[i].textContent=t;ids[i].classList.remove('tk');void ids[i].offsetWidth;ids[i].classList.add('tk');}});
+  }
+  tick();setInterval(tick,1000);
+  const btn=document.getElementById('calBtn'),opts=document.getElementById('calOpts');
+  const TITLE='فرح حسن وآية',PLACE='ليلة العمر — عزبة النخل',MAP='https://maps.app.goo.gl/RhDDS28mYLeqBVtw6';
+  const SITE=String((window.GIFT&&window.GIFT.SITE_URL)||'');
+  const DESC='دعوة فرح حسن وآية'+(SITE?('\n'+SITE):'')+'\nالموقع: '+MAP;
+  function build(){
+    const g=document.getElementById('calG'),i=document.getElementById('calI');
+    g.href='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(TITLE)+'&dates=20261118T180000Z/20261118T213000Z&details='+encodeURIComponent(DESC)+'&location='+encodeURIComponent(PLACE)+'&ctz=Africa/Cairo';
+    const esc=t=>String(t).replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\;');
+    const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Hassan and Aya//Invite//AR','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT',
+      'UID:hassan-aya-20261118@invite','DTSTAMP:20261101T000000Z','DTSTART:20261118T180000Z','DTEND:20261118T213000Z',
+      'SUMMARY:'+esc(TITLE),'LOCATION:'+esc(PLACE),'DESCRIPTION:'+esc(DESC),'URL:'+MAP,
+      'BEGIN:VALARM','TRIGGER:-P1D','ACTION:DISPLAY','DESCRIPTION:'+esc('بكرة فرح حسن وآية'),'END:VALARM',
+      'BEGIN:VALARM','TRIGGER:-PT3H','ACTION:DISPLAY','DESCRIPTION:'+esc('كمان 3 ساعات فرح حسن وآية'),'END:VALARM',
+      'END:VEVENT','END:VCALENDAR'].join('\r\n');
+    i.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);
+  }
+  opts.addEventListener('click',e=>e.stopPropagation());
+  document.addEventListener('click',()=>{if(!opts.hidden){opts.hidden=true;btn.setAttribute('aria-expanded','false');}});
+  btn.addEventListener('click',e=>{
+    e.stopPropagation();build();
+    const open=opts.hidden;opts.hidden=!open;btn.setAttribute('aria-expanded',open?'true':'false');
+    if(open&&opts.animate)opts.animate([{opacity:0,transform:'translateY(-6px)'},{opacity:1,transform:'none'}],{duration:260,easing:'ease-out'});
+  });
+})();
 </script>
 </body>
 </html>

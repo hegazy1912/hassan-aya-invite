@@ -79,7 +79,13 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
       <button class="btn" id="copyKey">نسخ المفتاح</button>
       <button class="btn" id="newKey">مفتاح جديد</button>
     </div>
-    <div class="note">مهم: لو غيّرت المفتاح بعد ما ظبطت الشيت، لازم تفتح Apps Script وتستبدل الكود بالكود الجديد اللي تحت، وتعمل Deploy من جديد.</div>
+    <p style="margin-top:16px"><b style="color:var(--cream)">مفتاح رسايل العريس:</b> مفتاح تاني مخصوص بلينك الرسايل (غير مفتاح الإدارة). هتلاقيه في الكود، ومتحطهوش في لينك الدعوة.</p>
+    <div class="keyBox">
+      <input id="msgKey" readonly>
+      <button class="btn" id="copyMsgKey">نسخ المفتاح</button>
+      <button class="btn" id="newMsgKey">مفتاح جديد</button>
+    </div>
+    <div class="note">مهم: لو غيّرت أي مفتاح بعد ما ظبطت الشيت، لازم تفتح Apps Script وتستبدل الكود بالكود الجديد اللي تحت، وتعمل Deploy من جديد.</div>
   </section>
 
   <section class="panel">
@@ -122,15 +128,15 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
 <script>
 (function(){
   'use strict';
-  var keyEl=document.getElementById('key'),codeEl=document.getElementById('code'),msgEl=document.getElementById('msg'),toastEl=document.getElementById('toast');
+  var keyEl=document.getElementById('key'),msgKeyEl=document.getElementById('msgKey'),codeEl=document.getElementById('code'),msgEl=document.getElementById('msg'),toastEl=document.getElementById('toast');
   var code='';
   function toast(t){toastEl.textContent=t;toastEl.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){toastEl.classList.remove('on');},2800);}
-  function makeKey(){
+  function makeKey(prefix){
     var chars='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
     var arr=new Uint8Array(24);
     if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(arr);
     else for(var i=0;i<arr.length;i++)arr[i]=Math.floor(Math.random()*256);
-    var s='GIFT-';
+    var s=prefix||'GIFT-';
     for(var j=0;j<arr.length;j++)s+=chars.charAt(arr[j]%chars.length);
     return s;
   }
@@ -138,6 +144,12 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
     var k='';
     try{k=localStorage.getItem('gift.key')||'';}catch(e){}
     if(!k){k=makeKey();try{localStorage.setItem('gift.key',k);}catch(e){}}
+    return k;
+  }
+  function getMsgKey(){
+    var k='';
+    try{k=localStorage.getItem('gift.msgkey')||'';}catch(e){}
+    if(!k){k=makeKey('MSG-');try{localStorage.setItem('gift.msgkey',k);}catch(e){}}
     return k;
   }
   function copyText(t){
@@ -150,9 +162,9 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
     else fallback();
   }
   function paint(){
-    var k=getKey();
-    keyEl.value=k;
-    codeEl.textContent=code?code.split('__ADMIN_KEY__').join(k):'';
+    var k=getKey(),mk=getMsgKey();
+    keyEl.value=k;msgKeyEl.value=mk;
+    codeEl.textContent=code?code.split('__ADMIN_KEY__').join(k).split('__MSG_KEY__').join(mk):'';
   }
   function loadCode(){
     fetch('apps-script.txt',{cache:'no-store'}).then(function(r){
@@ -169,12 +181,20 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
     });
   }
   document.getElementById('copyKey').onclick=function(){copyText(keyEl.value);};
+  document.getElementById('copyMsgKey').onclick=function(){copyText(msgKeyEl.value);};
   document.getElementById('newKey').onclick=function(){
     if(!confirm('لو غيّرت المفتاح، لازم تحدّث الكود في Apps Script وتعمل Deploy من جديد. تكمل؟'))return;
     var k=makeKey();
     try{localStorage.setItem('gift.key',k);}catch(e){}
     paint();
     toast('اتولد مفتاح جديد');
+  };
+  document.getElementById('newMsgKey').onclick=function(){
+    if(!confirm('لو غيّرت مفتاح الرسايل، لازم تحدّث الكود في Apps Script وتعمل Deploy من جديد. تكمل؟'))return;
+    var k=makeKey('MSG-');
+    try{localStorage.setItem('gift.msgkey',k);}catch(e){}
+    paint();
+    toast('اتولد مفتاح رسايل جديد');
   };
   document.getElementById('copyCode').onclick=function(){
     if(!code){toast('الكود لسه بيحمّل');return;}

@@ -184,6 +184,17 @@ details .hint{margin-top:10px}
       <div class="stat sent"><span>اتبعتله</span><b id="stSent">0</b></div>
     </div>
 
+    <section class="panel" id="msgPanel" style="margin-bottom:16px">
+      <h2>💌 رسايل الضيوف للعرسان <span class="chip sent" id="msgCnt" style="margin-right:8px">٠ رسالة</span></h2>
+      <p class="hint">الرسايل مقفولة لحد الوقت اللي في <span dir="ltr">UNLOCK_AT</span> جوه كود الشيت (بعد الفرح)، ومش بتظهر هنا خالص. اللينك اللي تحت للعريس بس.</p>
+      <label for="msgKey">المفتاح الخاص برسايل العريس (<span dir="ltr">MSG_KEY</span> في كود الشيت — غير مفتاح الإدارة)</label>
+      <input id="msgKey" type="text" dir="ltr" placeholder="MSG-..." autocomplete="off">
+      <div class="setupActions" style="margin-top:12px">
+        <button class="btn gold" id="msgCopy">نسخ لينك العريس</button>
+        <button class="btn" id="msgDemo">معاينة تجريبية</button>
+      </div>
+    </section>
+
     <div class="grid">
       <section class="panel">
         <div class="addHead">
@@ -638,8 +649,19 @@ details .hint{margin-top:10px}
     el.addEventListener('input',function(){setWarn();});
   });
 
+  /* ---- رسايل العريس ---- */
+  var msgKeyEl=$('#msgKey');
+  msgKeyEl.value=localStorage.getItem('gift.msgkey')||'';
+  msgKeyEl.addEventListener('input',function(){localStorage.setItem('gift.msgkey',msgKeyEl.value.trim());});
+  function msgBase(){var b=baseUrl();if(!/\/$/.test(b))b=b.replace(/[^\/]*$/,'');return b+(/\/$/.test(b)?'':'/')+'messages.html';}
+  function groomLink(){var k=msgKeyEl.value.trim();if(!k)return '';return msgBase()+'#k='+encodeURIComponent(k)+'&e='+encodeURIComponent(state.api);}
+  $('#msgCopy').onclick=function(){var l=groomLink();if(!l){toast('اكتب مفتاح الرسايل الأول');return;}copyText(l);};
+  $('#msgDemo').onclick=function(){window.open(msgBase()+'?demo=1','_blank');};
+  function loadMsgCount(){
+    jsonp({action:'msgcount'}).then(function(r){if(r&&r.ok)$('#msgCnt').textContent=(r.count|0).toLocaleString('ar-EG')+' رسالة';}).catch(function(){});
+  }
   fillInputs();
-  if(state.api&&state.key)load(true);else showSetup('');
+  if(state.api&&state.key){load(true).then(loadMsgCount);}else showSetup('');
   setInterval(function(){
     if(!document.hidden&&state.api&&state.key&&!state.busy)load(true);
   },45000);
