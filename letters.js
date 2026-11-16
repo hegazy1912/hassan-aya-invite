@@ -6,6 +6,8 @@
 (function () {
   'use strict';
   var LET = window.LET = { muted: false };
+  var LITE = (window.matchMedia && window.matchMedia('(max-width: 760px)').matches) || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || ((navigator.hardwareConcurrency || 8) <= 4) || ((navigator.deviceMemory || 8) <= 4);
+  LET.lite = LITE;
 
   /* ---------- ألوان الورق/الظرف ---------- */
   var TH = {
@@ -96,6 +98,7 @@
   /* ---------- قصاصات وبتلات (بتتحط على الشاشة كلها) ---------- */
   LET.confetti = function (x, y, n, o) {
     o = o || {};
+    if (LITE) n = Math.min(n, 24);
     var cols = o.colors || ['#ffd9a0', '#ffb3c1', '#ffe9b0', '#f6c9d3', '#d8b878', '#ffffff'];
     for (var i = 0; i < n; i++) {
       var p = $('div', 'lt-conf'), petal = Math.random() < .5, s = rnd(6, 12);
@@ -331,7 +334,7 @@
       box.setCount(n); LET.sfx.chime(); box.shine();
       /* شرارات من فتحة الصندوق */
       var ems = ['✨', '💛', '💌', '🤍', '✨'];
-      for (var i = 0; i < 9; i++) {
+      for (var i = 0; i < (LITE ? 4 : 9); i++) {
         var sp = $('span', 'lt-spark', ems[i % ems.length]); sp.style.left = (140 - 6) + 'px'; sp.style.top = '226px'; sp.style.fontSize = Math.round(rnd(11, 18)) + 'px';
         stage.appendChild(sp);
         (function (sp) { A(sp, [{ opacity: 0, transform: 'translate(0,0) scale(.4)' }, { opacity: 1, transform: 'translate(' + rnd(-70, 70) + 'px,' + rnd(-110, -50) + 'px) scale(1)', offset: .4 }, { opacity: 0, transform: 'translate(' + rnd(-90, 90) + 'px,' + rnd(-60, 10) + 'px) scale(.8)' }], rnd(1100, 1700), 'ease-out', rnd(0, 350)).then(function () { sp.remove(); }); })(sp);

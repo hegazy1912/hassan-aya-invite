@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <script src="config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <style>
 :root{--bg:#070a12;--panel:#0e1320;--panel2:#131a2a;--line:rgba(216,184,120,.22);--gold:#d8b878;--cream:#f8f1e4;--muted:rgba(248,241,228,.55);--green:#25d366;--red:#ff7a7a;--blue:#8fc7ff}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -251,6 +251,7 @@ details .hint{margin-top:10px}
           <button class="btn gold" id="exportGroom">تصدير شيت العريس (Excel)</button>
           <button class="btn gold" id="exportBride">تصدير شيت العروسة (Excel)</button>
         </div>
+        <p class="hint" style="margin:-2px 0 12px">بعد ما تبعت الدعوة اختار «تم» في عمود «تم الإرسال؟» جوه الـExcel والسطر هيتلوّن أخضر. Excel نفسه مش بيلوّن السطر أوتوماتيك عند الضغط على اللينك (ده محتاج ماكرو)، لكن عمود «تم» بيمنعك تبعته مرتين.</p>
         <div class="rows" id="rows"></div>
       </section>
     </div>
@@ -493,20 +494,25 @@ details .hint{margin-top:10px}
     if(!list.length){toast('اكتب اسم ضيف واحد على الأقل');return;}
     addBtn.disabled=true;
     var old=addBtn.textContent;
-    var done=0;
+    var cursor=0,added=0,dup=0;
     function next(){
-      if(done>=list.length){
+      if(cursor>=list.length){
         bulkEl.value='';
-        toast('تمت إضافة '+done+' ضيف'+(skipped?' — اتجاهل '+skipped+' سطر':''));
+        var note='تمت إضافة '+added+' ضيف';
+        if(dup)note+=' — اتجاهل '+dup+' رقم مكرر';
+        if(skipped)note+=' — اتجاهل '+skipped+' سطر';
+        toast(note);
         addBtn.disabled=false;
         addBtn.textContent=old;
         return load(true);
       }
-      var chunk=list.slice(done,done+10);
-      addBtn.textContent='بيضيف... '+Math.min(done+chunk.length,list.length)+'/'+list.length;
+      var chunk=list.slice(cursor,cursor+10);
+      addBtn.textContent='بيضيف... '+Math.min(cursor+chunk.length,list.length)+'/'+list.length;
       jsonp({action:'addbulk',key:state.key,data:JSON.stringify(chunk)}).then(function(res){
         if(!res||!res.ok)throw new Error((res&&res.error)||'فشل');
-        done+=res.added||chunk.length;
+        added+=res.added==null?chunk.length:Number(res.added)||0;
+        dup+=Number(res.skipped)||0;
+        cursor+=chunk.length;
         next();
       }).catch(function(err){
         var msg=String(err&&err.message||err);
@@ -591,29 +597,62 @@ details .hint{margin-top:10px}
   function exportSide(side){
     var list=state.guests.filter(function(g){return (g.side||'')===side;});
     if(!list.length){toast('مفيش ضيوف في طرف '+side);return;}
-    var rows=[['الاسم','الموبايل','الطرف','الحالة','لينك الواتساب','لينك الدعوة']],links=[];
+    var heads=['الاسم','الموبايل','الطرف','الحالة','لينك الواتساب','لينك الدعوة','تم الإرسال؟'];
+    var rows=[heads],links=[];
     list.forEach(function(g){
       var wa=waLink(g)||'',site=linkFor(g)||'',phone=normalizePhone(g.phone);
-      rows.push([g.name||'',phone?'+'+phone:'',side,g.status||'لسه',wa,site]);
+      rows.push([g.name||'',phone?'+'+phone:'',side,g.status||'لسه','','',g.sentAt?'تم':'']);
       links.push({wa:wa,site:site});
     });
-    if(window.XLSX){
-      var ws=XLSX.utils.aoa_to_sheet(rows);
-      for(var r=1;r<rows.length;r++){
-        var waCell=ws[XLSX.utils.encode_cell({r:r,c:4})];
-        if(waCell&&links[r-1].wa){waCell.v='افتح واتساب';waCell.l={Target:links[r-1].wa,Tooltip:'افتح واتساب وابعت الدعوة'};}
-        var siteCell=ws[XLSX.utils.encode_cell({r:r,c:5})];
-        if(siteCell&&links[r-1].site){siteCell.v='افتح الدعوة';siteCell.l={Target:links[r-1].site,Tooltip:'لينك الدعوة'};}
-      }
-      ws['!cols']=[{wch:28},{wch:16},{wch:12},{wch:10},{wch:18},{wch:18}];
-      ws['!autofilter']={ref:'A1:F'+rows.length};
-      var wb=XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb,ws,side);
-      XLSX.writeFile(wb,'دعوات-'+side+'.xlsx');
-    }else{
+    if(!window.ExcelJS){
       downloadBlob(new Blob([csvText(rows)],{type:'text/csv;charset=utf-8;'}),'دعوات-'+side+'.csv');
       toast('تم تنزيل CSV (مكتبة Excel مش متاحة)');
+      return;
     }
+    var wb=new ExcelJS.Workbook();
+    var ws=wb.addWorksheet(side,{views:[{state:'frozen',ySplit:1,rightToLeft:true}]});
+    ws.columns=[
+      {header:heads[0],key:'name',width:30},
+      {header:heads[1],key:'phone',width:16},
+      {header:heads[2],key:'side',width:12},
+      {header:heads[3],key:'status',width:10},
+      {header:heads[4],key:'wa',width:18},
+      {header:heads[5],key:'site',width:18},
+      {header:heads[6],key:'done',width:14}
+    ];
+    ws.getRow(1).eachCell(function(cell){
+      cell.font={bold:true,color:{argb:'FF3A2A12'}};
+      cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF3E9D8'}};
+      cell.alignment={horizontal:'center',vertical:'middle'};
+    });
+    list.forEach(function(g,i){
+      var l=links[i];
+      var row=ws.addRow({name:g.name||'',phone:rows[i+1][1],side:side,status:g.status||'لسه',done:rows[i+1][6]});
+      row.height=22;
+      if(l.wa)row.getCell('wa').value={text:'افتح واتساب',hyperlink:l.wa,tooltip:'افتح واتساب وابعت الدعوة'};
+      if(l.site)row.getCell('site').value={text:'افتح الدعوة',hyperlink:l.site,tooltip:'لينك الدعوة'};
+      row.getCell('wa').font={color:{argb:'FF0B6E4F'},underline:true};
+      row.getCell('site').font={color:{argb:'FF0B6E4F'},underline:true};
+      row.getCell('done').dataValidation={type:'list',allowBlank:true,formulae:['"تم,لسه"']};
+      row.getCell('done').alignment={horizontal:'center',vertical:'middle'};
+      row.getCell('status').alignment={horizontal:'center',vertical:'middle'};
+      row.getCell('side').alignment={horizontal:'center',vertical:'middle'};
+    });
+    ws.addConditionalFormatting({
+      ref:'A2:G'+(list.length+1),
+      rules:[{
+        type:'expression',
+        formulae:['$G2="تم"'],
+        style:{fill:{type:'pattern',pattern:'solid',bgColor:{argb:'FFE6F7EC'}}}
+      }]
+    });
+    ws.autoFilter={from:'A1',to:'G1'};
+    wb.xlsx.writeBuffer().then(function(buf){
+      downloadBlob(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'دعوات-'+side+'.xlsx');
+      toast('اتنزل Excel — اختار «تم» في عمود «تم الإرسال؟» والسطر يتحول أخضر');
+    }).catch(function(err){
+      toast('مش قادر أطلع Excel: '+String(err&&err.message||err));
+    });
   }
 
   function stats(){

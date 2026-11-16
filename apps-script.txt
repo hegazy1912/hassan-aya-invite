@@ -29,6 +29,8 @@ function doGet(e) {
       out = doMsg_(sh, p);
     } else if (action === 'msgcount') {
       out = { count: msgCount_() };
+    } else if (action === 'check') {
+      out = doCheck_(sh, p);
     } else if (action === 'msgs') {
       if (String(p.key || '') !== MSG_KEY) throw new Error('unauthorized');
       out = doMsgs_();
@@ -117,6 +119,18 @@ function normPhone_(v) {
   return s;
 }
 
+function phoneSet_(sh) {
+  var set = {};
+  var last = sh.getLastRow();
+  if (last < 2) return set;
+  var vals = sh.getRange(2, 3, last - 1, 1).getValues();
+  for (var i = 0; i < vals.length; i++) {
+    var phone = normPhone_(vals[i][0]);
+    if (phone) set[phone] = true;
+  }
+  return set;
+}
+
 function normSide_(v) {
   var s = String(v || '').trim();
   if (s === SIDES.groom || s === 'عريس' || s === 'groom') return SIDES.groom;
@@ -169,9 +183,11 @@ function doList_(sh) {
 function doAdd_(sh, p) {
   var name = String(p.name || '').trim().slice(0, 120);
   if (!name) throw new Error('name_required');
+  var phone = normPhone_(p.phone || '');
+  if (phone && phoneSet_(sh)[phone]) throw new Error('duplicate_phone');
   var id = makeId_();
   var side = normSide_(p.side);
-  sh.appendRow([id, name, normPhone_(p.phone || ''), STATUS.pending, '', '', side]);
+  sh.appendRow([id, name, phone, STATUS.pending, '', '', side]);
   return { id: id, name: name, side: side };
 }
 
@@ -183,16 +199,28 @@ function doAddBulk_(sh, p) {
     throw new Error('bad_data');
   }
   if (!Array.isArray(arr)) throw new Error('bad_data');
+  var known = phoneSet_(sh);
   var rows = [];
+  var skipped = 0;
   for (var i = 0; i < arr.length; i++) {
     var g = arr[i] || {};
     var name = String(g.name || '').trim().slice(0, 120);
     if (!name) continue;
-    rows.push([makeId_(), name, normPhone_(g.phone || ''), STATUS.pending, '', '', normSide_(g.side)]);
+    var phone = normPhone_(g.phone || '');
+    if (phone && known[phone]) { skipped++; continue; }
+    if (phone) known[phone] = true;
+    rows.push([makeId_(), name, phone, STATUS.pending, '', '', normSide_(g.side)]);
   }
-  if (!rows.length) return { added: 0 };
+  if (!rows.length) return { added: 0, skipped: skipped };
   sh.getRange(sh.getLastRow() + 1, 1, rows.length, HEADERS.length).setValues(rows);
-  return { added: rows.length };
+  return { added: rows.length, skipped: skipped };
+}
+
+function doCheck_(sh, p) {
+  var id = String(p.id || '').trim();
+  if (!id) return { id: '', status: '' };
+  var row = findRow_(sh, id);
+  return { id: id, status: row ? String(sh.getRange(row, 4).getValue()).trim() : '' };
 }
 
 function doSent_(sh, p) {
