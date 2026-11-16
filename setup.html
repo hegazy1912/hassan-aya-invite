@@ -95,8 +95,21 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
   </section>
 
   <section class="panel">
-    <h2>الخطوات</h2>
-    <ol class="steps">
+    <h2>روابط الإرسال السرية</h2>
+    <p>روابط سرية مخصصة لكل طرف، عشان كل واحد يبعت من صفحته.</p>
+    <div class="keyBox">
+      <input id="groomLink" readonly>
+      <button class="btn" id="copyGroomLink">نسخ الرابط</button>
+    </div>
+    <div class="keyBox">
+      <input id="brideLink" readonly>
+      <button class="btn" id="copyBrideLink">نسخ الرابط</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>
+      <ol class="steps">
       <li><b>اعمل شيت جديد:</b> افتح <a href="https://sheets.new" target="_blank" rel="noopener" style="color:var(--gold)">sheets.new</a> وسمّيه أي اسم.</li>
       <li>من داخل الشيت: <b>Extensions</b> ← <b>Apps Script</b>.</li>
       <li>امسح أي كود موجود، وبعدين <b>الصق الكود اللي تحت</b> بالكامل.</li>
@@ -179,10 +192,20 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){toast('اتنسخ ✅');},fallback);
     else fallback();
   }
+  function paintLinks(){
+    var mk=getMsgKey();
+    var api='';var couple='';
+    try{api=localStorage.getItem('gift.api')||'';couple=localStorage.getItem('gift.couple')||'';}catch(e){}
+    var g='https://hegazy1912.github.io/hassan-aya-invite/groom.html#k='+mk+'&e='+encodeURIComponent(api)+'&w='+encodeURIComponent(couple)+'&side=groom';
+    var b='https://hegazy1912.github.io/hassan-aya-invite/bride.html#k='+mk+'&e='+encodeURIComponent(api)+'&w='+encodeURIComponent(couple)+'&side=bride';
+    var gi=document.getElementById('groomLink'),bi=document.getElementById('brideLink');
+    if(gi)gi.value=g;
+    if(bi)bi.value=b;
+  }
   function paint(){
     var k=getKey(),mk=getMsgKey(),pin=getMsgPin();
     keyEl.value=k;msgKeyEl.value=mk;pinEl.value=pin;
-    codeEl.textContent=code?code.split('__ADMIN_KEY__').join(k).split('__MSG_KEY__').join(mk).split('__MSG_PIN__').join(pin):'';
+    paintLinks();
   }
   function loadCode(){
     fetch('apps-script.txt',{cache:'no-store'}).then(function(r){
@@ -201,6 +224,8 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
   document.getElementById('copyKey').onclick=function(){copyText(keyEl.value);};
   document.getElementById('copyMsgKey').onclick=function(){copyText(msgKeyEl.value);};
   document.getElementById('copyMsgPin').onclick=function(){copyText(pinEl.value);};
+  document.getElementById('copyGroomLink').onclick=function(){copyText(document.getElementById('groomLink').value);};
+  document.getElementById('copyBrideLink').onclick=function(){copyText(document.getElementById('brideLink').value);};
   document.getElementById('newKey').onclick=function(){
     if(!confirm('لو غيّرت المفتاح، لازم تحدّث الكود في Apps Script وتعمل Deploy من جديد. تكمل؟'))return;
     var k=makeKey();
