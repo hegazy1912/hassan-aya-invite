@@ -81,12 +81,20 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
     </div>
     <p style="margin-top:16px"><b style="color:var(--cream)">مفتاح رسايل العريس:</b> مفتاح تاني مخصوص بلينك الرسايل (غير مفتاح الإدارة). هتلاقيه في الكود، ومتحطهوش في لينك الدعوة.</p>
     <div class="keyBox">
+    <div class="keyBox">
+      <input id="brideKey" readonly>
+      <button class="btn" id="newBrideKey">جديد مفتاح العروسة</button>
+    </div>
       <input id="msgKey" readonly>
       <button class="btn" id="copyMsgKey">نسخ المفتاح</button>
       <button class="btn" id="newMsgKey">مفتاح جديد</button>
     </div>
     <p style="margin-top:16px"><b style="color:var(--cream)">PIN رسايل العريس:</b> 4 أرقام إضافية. اللينك لوحده مش هيفتح الرسايل — ابعته للعريس في رسالة منفصلة.</p>
     <div class="keyBox">
+    <div class="keyBox">
+      <input id="bridePin" readonly inputmode="numeric" maxlength="4">
+      <button class="btn" id="newBridePin">جديد PIN العروسة</button>
+    </div>
       <input id="msgPin" readonly inputmode="numeric" maxlength="4">
       <button class="btn" id="copyMsgPin">نسخ الـPIN</button>
       <button class="btn" id="newMsgPin">PIN جديد</button>
@@ -147,7 +155,7 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
 <script>
 (function(){
   'use strict';
-  var keyEl=document.getElementById('key'),msgKeyEl=document.getElementById('msgKey'),pinEl=document.getElementById('msgPin'),codeEl=document.getElementById('code'),msgEl=document.getElementById('msg'),toastEl=document.getElementById('toast');
+  var keyEl=document.getElementById('key'),msgKeyEl=document.getElementById('msgKey'),pinEl=document.getElementById('msgPin'),brideKeyEl=document.getElementById('brideKey'),bridePinEl=document.getElementById('bridePin'),codeEl=document.getElementById('code'),msgEl=document.getElementById('msg'),toastEl=document.getElementById('toast');
   var code='';
   function toast(t){toastEl.textContent=t;toastEl.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){toastEl.classList.remove('on');},2800);}
   function makeKey(prefix){
@@ -202,9 +210,45 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
     if(gi)gi.value=g;
     if(bi)bi.value=b;
   }
+  function getBrideKey(){
+    var k='';
+    try{k=localStorage.getItem('gift.msgbridekey')||'';}catch(e){}
+    if(!k){k=makeKey('MSG-');try{localStorage.setItem('gift.msgbridekey',k);}catch(e){}}
+    return k;
+  }
+  function getBridePin(){
+    var k=getBrideKey();
+    var p='';
+    try{p=String(localStorage.getItem('gift.msgbridepin.'+k)||'').replace(/\D/g,'').slice(0,4);}catch(e){}
+    if(p.length!==4){p=makePin();try{localStorage.setItem('gift.msgbridepin.'+k,p);}catch(e){}}
+    return p;
+  }
+  function newBrideKey(){
+    if(!confirm('???? ????? ???????? ???? ????? ????? ?? Apps Script ????? Deploy ?? ????. ??????'))return;
+    var k=makeKey('MSG-');
+    try{localStorage.setItem('gift.msgbridekey',k);localStorage.setItem('gift.msgpin.'+k,getBridePin());}catch(e){}
+    paint();
+  }
+  function newBridePin(){
+    if(!confirm('???? ????? ???PIN? ???? ????? ????? ?? Apps Script ????? Deploy ?? ????. ??????'))return;
+    var k=getBrideKey();
+    try{localStorage.setItem('gift.msgbridepin.'+k,makePin());}catch(e){}
+    paint();
+  }
+  function paintLinks(){
+    var mk=getMsgKey();
+    var bk=getBrideKey();
+    var api='';var couple='';
+    try{api=localStorage.getItem('gift.api')||'';couple=localStorage.getItem('gift.couple')||'';}catch(e){}
+    var g='https://hegazy1912.github.io/hassan-aya-invite/groom.html#k='+mk+'&e='+encodeURIComponent(api)+'&w='+encodeURIComponent(couple)+'&side=groom';
+    var b='https://hegazy1912.github.io/hassan-aya-invite/bride.html#k='+bk+'&e='+encodeURIComponent(api)+'&w='+encodeURIComponent(couple)+'&side=bride';
+    var gi=document.getElementById('groomLink'),bi=document.getElementById('brideLink');
+    if(gi)gi.value=g;
+    if(bi)bi.value=b;
+  }
   function paint(){
-    var k=getKey(),mk=getMsgKey(),pin=getMsgPin();
-    keyEl.value=k;msgKeyEl.value=mk;pinEl.value=pin;
+    var k=getKey(),mk=getMsgKey(),pin=getMsgPin(),bk=getBrideKey(),bpin=getBridePin();
+    keyEl.value=k;msgKeyEl.value=mk;pinEl.value=pin;brideKeyEl.value=bk;bridePinEl.value=bpin;
     paintLinks();
   }
   function loadCode(){
@@ -226,6 +270,9 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
   document.getElementById('copyMsgPin').onclick=function(){copyText(pinEl.value);};
   document.getElementById('copyGroomLink').onclick=function(){copyText(document.getElementById('groomLink').value);};
   document.getElementById('copyBrideLink').onclick=function(){copyText(document.getElementById('brideLink').value);};
+  document.getElementById('newBrideKey').onclick=function(){newBrideKey();};
+  document.getElementById('copyBridePin').onclick=function(){copyText(document.getElementById('bridePin').value);};
+  document.getElementById('newBridePin').onclick=function(){newBridePin();};
   document.getElementById('newKey').onclick=function(){
     if(!confirm('لو غيّرت المفتاح، لازم تحدّث الكود في Apps Script وتعمل Deploy من جديد. تكمل؟'))return;
     var k=makeKey();
