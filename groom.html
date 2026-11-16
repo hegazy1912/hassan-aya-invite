@@ -1,0 +1,219 @@
+﻿<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>رسايل الضيوف للعريس</title>
+<style>
+:root{--cream:#f8f1e4;--gold:#d8b878}
+body{background:#04060d;color:var(--cream);font-family:"Cairo","Segoe UI",Tahoma,sans-serif;overflow:hidden}
+.bg{position:fixed;inset:0;z-index:0;background:radial-gradient(1200px 700px at 70% 12%,rgba(216,184,120,.10),transparent 60%),radial-gradient(900px 600px at 20% 90%,rgba(143,199,255,.07),transparent 60%),#04060d}
+.bg .moon{position:absolute;top:9%;right:12%;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff6e6,#d8b878 60%,#8a6a35);box-shadow:0 0 60px 18px rgba(216,184,120,.18)}
+.petals{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:2}
+.petals i{position:absolute;top:-8%;border-radius:60% 20% 60% 20%;background:rgba(216,184,120,.25);animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(115vh) rotate(340deg)}}
+.vig{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(circle at 50% 42%,transparent 30%,rgba(1,2,5,.93) 100%)}
+.app{position:fixed;inset:0;z-index:3;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px clamp(14px,4vw,34px);gap:12px}
+.mono{font-family:"Cormorant Garamond",serif;font-size:24px;letter-spacing:.08em;color:var(--gold);white-space:nowrap}
+.mono i{font-style:italic;color:var(--cream);padding:0 2px}
+.ttl{font-size:12px;letter-spacing:2px;color:rgba(248,241,228,.55)}
+.cnt{font-size:12px;letter-spacing:1px;color:rgba(248,241,228,.7);min-width:90px;text-align:left}
+.cnt b{color:#ffe9b0;font-weight:600}
+.main{flex:1;min-height:0;display:grid;place-items:center;position:relative;padding:0 10px}
+.wrap{position:relative}
+.screen{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px}
+.screen[hidden]{display:none}
+.screen h2{font-size:clamp(20px,4.6vw,28px);font-weight:600;margin:14px 0 6px;color:#fdf6e9}
+.screen p{font-size:13px;line-height:1.9;color:rgba(248,241,228,.62);max-width:420px;margin:0 auto}
+.pinBox{display:grid;gap:12px;justify-items:center;width:min(320px,84vw);margin:16px auto 0}
+#pinInput{width:100%;text-align:center;font-family:inherit;font-size:24px;letter-spacing:12px;padding:14px 12px;border-radius:16px;background:rgba(10,14,26,.6);border:1px solid rgba(216,184,120,.4);color:#fdf6e9;outline:none;direction:ltr}
+#pinInput:focus{border-color:rgba(216,184,120,.9);box-shadow:0 0 0 3px rgba(216,184,120,.15)}
+#pinErr{font-size:12px;color:#ffd9a0;min-height:16px}
+.hint{font-size:12px;letter-spacing:2px;color:rgba(216,184,120,.8);text-align:center;padding:8px;min-height:16px}
+.bar{height:3px;margin:0 clamp(14px,6vw,60px);border-radius:3px;background:rgba(248,241,228,.1);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#d8b878,#ffe9b0);transition:width .6s cubic-bezier(.3,.7,.2,1)}
+.ctl{display:flex;align-items:center;justify-content:center;gap:14px;padding:14px 14px calc(18px + env(safe-area-inset-bottom));position:relative;z-index:5}
+.ibtn{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:rgba(248,241,228,.8);background:rgba(10,14,26,.4);border:1px solid rgba(216,184,120,.3);backdrop-filter:blur(6px);transition:.25s}
+.ibtn:hover{border-color:rgba(216,184,120,.8);color:#fff;background:rgba(216,184,120,.12)}
+.ibtn:active{transform:scale(.92)}
+.ibtn:disabled{opacity:.3;cursor:default;pointer-events:none}
+.ibtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s}
+.ibtn.nx:hover svg{transform:translateX(-4px)}.ibtn.pv:hover svg{transform:translateX(4px)}
+.go{min-width:150px;font-family:inherit;font-size:14px;font-weight:600;letter-spacing:.5px;padding:13px 28px;border-radius:999px;cursor:pointer;background:rgba(216,184,120,.94);border:1px solid rgba(216,184,120,.94);color:#1a1208;transition:.25s}
+.go:hover{background:#eccf98;transform:translateY(-1px)}
+.go:disabled{opacity:.5;cursor:default}
+.go.pulse{animation:goPulse 2s ease-in-out infinite}
+@keyframes goPulse{50%{box-shadow:0 0 0 8px rgba(216,184,120,.14),0 0 30px rgba(216,184,120,.35)}}
+.toast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,14px);z-index:30;pointer-events:none;background:rgba(8,12,22,.92);border:1px solid rgba(216,184,120,.4);padding:10px 22px;border-radius:999px;font-size:12px;letter-spacing:1px;opacity:0;transition:.4s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.card{width:min(92vw,340px);padding:22px 18px;border-radius:22px;text-align:center;background:linear-gradient(180deg,rgba(22,20,26,.97),rgba(9,9,14,.98));border:1px solid rgba(216,184,120,.45);box-shadow:0 30px 90px rgba(0,0,0,.7),0 0 80px rgba(216,184,120,.08)}
+.card .who{font-family:"Cormorant Garamond",serif;font-size:26px;color:#fdf6e9;margin-bottom:6px}
+.card .who2{font-size:12px;color:rgba(248,241,228,.55);margin-top:6px}
+.card .status{margin:12px 0}
+.chip{display:inline-block;font-size:11px;letter-spacing:1px;padding:5px 12px;border-radius:999px;border:1px solid rgba(216,184,120,.4);color:rgba(248,241,228,.8);background:rgba(216,184,120,.08)}
+.chip.sent{color:#9df5c0;border-color:rgba(126,242,168,.5);background:rgba(126,242,168,.1)}
+.card .send{margin-top:16px}
+.btn-send{display:inline-flex;align-items:center;gap:8px;justify-content:center;width:100%;font-family:inherit;font-size:14px;font-weight:700;letter-spacing:.6px;padding:14px 20px;border-radius:999px;cursor:pointer;border:1px solid rgba(126,242,168,.9);background:rgba(126,242,168,.92);color:#06210f;transition:.25s}
+.btn-send:hover{background:#9cf7bb;transform:translateY(-1px)}
+.btn-send:disabled{opacity:.5;cursor:default}
+.btn-ghost{display:inline-flex;align-items:center;justify-content:center;width:100%;font-family:inherit;font-size:12px;letter-spacing:.5px;padding:11px 20px;border-radius:999px;cursor:pointer;border:1px solid rgba(248,241,228,.22);background:transparent;color:rgba(248,241,228,.8);transition:.25s}
+.btn-ghost:hover{border-color:rgba(216,184,120,.6);color:#fff}
+@media(max-width:480px){.ttl{display:none}.go{min-width:130px;padding:12px 20px}}
+@media(prefers-reduced-motion:reduce){.bg i,.petals i{animation:none}}
+</style>
+</head>
+<body>
+<div class="bg" id="bg"><div class="moon"></div></div>
+<div class="petals" id="petals"></div>
+<div class="vig"></div>
+<div class="app" id="app">
+  <div class="top">
+    <div class="mono">H<i>&amp;</i>A</div>
+    <div class="ttl" id="ttl">رسايل الضيوف</div>
+    <div class="cnt" id="cnt"></div>
+  </div>
+  <div class="main" id="main"><div class="wrap"><div id="stage"></div></div>
+    <div class="screen" id="sLoad"><div><p>بنجهّز الصندوق…</p></div></div>
+    <div class="screen" id="sErr" hidden><div><h2 id="eT">في مشكلة</h2><p id="eP"></p></div></div>
+    <div class="screen" id="sEmpty" hidden><div><div style="font-size:54px">💌</div><h2>الصندوق لسه فاضي</h2><p>محدش سابلكم رسالة لسه. ارجعوا بعد شوية.</p></div></div>
+    <div class="screen" id="sLock" hidden><div><h2>الرسايل مقفولة لحد بعد الفرح 🔒</h2><p>اللينك ده هيفتحها أوتوماتيك أول ما الوقت يجي.</p><div class="fan" id="fan"></div><div class="lock" id="lockBtn" title="فتح"><svg viewBox="0 0 64 64"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3d2"/><stop offset=".5" stop-color="#d8b878"/><stop offset="1" stop-color="#9a7428"/></linearGradient></defs><path d="M20 28v-7a12 12 0 0 1 24 0v7" fill="none" stroke="url(#lg)" stroke-width="5" stroke-linecap="round"/><rect x="12" y="27" width="40" height="30" rx="7" fill="url(#lg)"/><circle cx="32" cy="40" r="4.2" fill="#3a2608"/><rect x="30.2" y="42" width="3.6" height="8" rx="1.6" fill="#3a2608"/></svg></div><p id="lockP"></p><div class="cd" id="cd"><div><b id="cdD">0</b><span>يوم</span></div><div><b id="cdH">0</b><span>ساعة</span></div><div><b id="cdM">0</b><span>دقيقة</span></div><div><b id="cdS">0</b><span>ثانية</span></div></div></div></div>
+    <div class="screen" id="sPin" hidden><div><div style="font-size:44px">🔐</div><h2>لازم PIN عشان تشوف الرسايل</h2><p>ادخلي PIN اللي حصّلت من العريس أو العروسة.</p><div class="pinBox"><input id="pinInput" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="••••"/><button class="go" id="pinGo">دخول</button><p id="pinErr"></p></div></div>
+    <div class="screen" id="sCard" hidden><div><div class="card" id="card">
+      <div class="who" id="cardName">اسم الضيف</div>
+      <div class="who2" id="cardPhone"></div>
+      <div class="status" id="cardStatus"><span class="chip" id="cardChip">لسه مش اتبعت</span></div>
+      <div class="send">
+        <button class="btn-send" id="sendBtn">ابعت واتساب</button>
+        <button class="btn-ghost" id="skipBtn">تخطي</button>
+        <button class="btn-ghost" id="backBtn">تراجع</button>
+      </div>
+    </div></div></div>
+    <div class="screen" id="sDone" hidden><div><div style="font-size:54px">🎉</div><h2>خلصت كل الرسايل!</h2><p>اتبعت معانا في واتساب. مستنيينك تفرحوا معانا ❤️</p></div></div>
+  </div>
+  <div class="hint" id="hint"></div>
+  <div class="bar" id="bar"><i id="barI"></i></div>
+  <div class="ctl" id="ctl">
+    <button class="ibtn pv" id="prev" aria-label="السابق"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    <button class="go pulse" id="go">ابعت واتساب</button>
+    <button class="ibtn nx" id="next" aria-label="التالي"><svg viewBox="0 0 24 24"><path d="M15 6l6 6-6 6"/></svg></button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="letters.js"></script>
+<script>
+(function(){
+'use strict';
+var GIFT=window.GIFT||{};
+var qs=new URLSearchParams(location.search);
+var hp=new URLSearchParams(String(location.hash||'').replace(/^#/,''));
+var DEMO=qs.get('demo')==='1', DEMO_LOCKED=qs.get('locked')==='1';
+var API=String(GIFT.RSVP_URL||'').trim()||String(hp.get('e')||'').trim();
+var KEY=String(hp.get('k')||qs.get('k')||'').trim();
+var SIDE=hp.get('side')||qs.get('side')||'groom';
+if(SIDE!=='groom'&&SIDE!=='bride')SIDE='';
+var PIN_KEY='gift.msgpin.'+KEY;var COUPLE_WA=String(GIFT.COUPLE_WA||'').trim()||String(hp.get('w')||'').trim();
+var PIN='';try{PIN=sessionStorage.getItem(PIN_KEY)||'';}catch(e){}
+var $=function(id){return document.getElementById(id);};
+var A=LET.A, sleep=LET.sleep, ar=function(n){try{return Number(n).toLocaleString('ar-EG');}catch(e){return String(n);}};
+
+(function(){var bg=$('bg');for(var i=0;i<70;i++){var s=document.createElement('i'),r=Math.random()*1.6+.4;s.style.cssText='left:'+Math.random()*100+'%;top:'+Math.random()*78+'%;width:'+r+'px;height:'+r+'px;animation-delay:'+(-Math.random()*4)+'s;animation-duration:'+(2.5+Math.random()*3)+'s';bg.appendChild(s);}var pt=$('petals');for(var j=0;j<14;j++){var p=document.createElement('i'),z=6+Math.random()*10;p.style.cssText='width:'+z+'px;height:'+z*.8+'px;left:'+Math.random()*100+'%;opacity:'+(.2+Math.random()*.4)+';animation-duration:'+(11+Math.random()*14)+'s;animation-delay:'+(-Math.random()*18)+'s';pt.appendChild(p);}})();
+function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){e.classList.remove('on');},2600);}
+function show(id){['sLoad','sErr','sEmpty','sLock','sPin','sCard','sDone'].forEach(function(k){$(k).hidden=(k!==id);});}
+function hideAll(){show('');}
+function fail(t,p){$('eT').textContent=t;$('eP').textContent=p||'';show('sErr');setUI(false);}
+function setUI(on){$('ctl').style.display=on?'':'none';$('bar').style.visibility=on?'':'hidden';}
+function setCnt(){var sent=GUESTS.filter(function(g){return g&&g.status==='sent';}).length;var tot=GUESTS.length;$('cnt').innerHTML=ar(sent)+' من '+ar(tot);$('barI').style.width=(tot?Math.round((sent/tot)*100):0)+'%';}
+
+function jsonp(params){return new Promise(function(resolve,reject){if(!API)return reject(new Error('noapi'));if(!KEY)return reject(new Error('nokey'));var cb='msgcb'+Math.random().toString(36).slice(2),q=new URLSearchParams(params);q.set('callback',cb);q.set('t',Date.now());var s=document.createElement('script'),done=false;function fin(e,d){if(done)return;done=true;clearTimeout(to);try{delete window[cb];}catch(x){}try{s.remove();}catch(x){}e?reject(e):resolve(d||{});}var to=setTimeout(function(){fin(new Error('timeout'));},20000);window[cb]=function(d){fin(null,d);};s.onerror=function(){fin(new Error('network'));};s.src=API+(API.indexOf('?')>=0?'&':'?')+q.toString();document.head.appendChild(s);});}
+function loadData(pin){if(DEMO){var arr=DEMO_MSGS.slice();var now=Date.now();return Promise.resolve({ok:true,locked:DEMO_LOCKED,unlockAt:new Date(now+((2*24+5)*3600+13*60)*1000).toISOString(),now:new Date(now).toISOString(),count:arr.length,messages:DEMO_LOCKED?[]:arr});}if(!API)return Promise.reject(new Error('noapi'));if(!KEY)return Promise.reject(new Error('nokey'));if(SIDE)return jsonp({action:'sendlist',key:KEY,pin:pin||''});return jsonp({action:'msgs',key:KEY,pin:pin||''});}
+
+var DEMO_MSGS=[
+ {name:'U.OU.U^O_',c:'cream',text:'O�U,U? U.O"O�U^U� USO OO3U+ USO O�OOO"US! O�O"U+O USO�U.U. U,U�U. O1U,U% OrUSO� U^O�U?OU,U^O U�U+O3U"OcOO U.O�U+O3U"Oc U.O�U+O3U"OcOO U.O�U+O3U"Oc OO U,O�U+O3U"Oc U.O�U+O3U"Oc U.O�O�U+U3U"Oc OO O1U,O�U+O3U"Oc OO'},
+ {name:'O3OO�Oc',c:'rose',text:'USO O�USOcOO OO3U+ U.OO,U^O, O"USU�US. O�U+O3U"Oc OO3U"Oc'},
+ {name:'O1U.O�',c:'sky',text:'U+O�USOOc U.U+ U^OOO_ O�O�U`O": OO,O3U�O,O?U.O<O�O�O� U^O+O�O+O�O� U^O+O�O+O�O� OU,O�O�U+U3U"OcOO O,O�O�O�U+U3U"Oc OO'},
+ {name:'U.OU.O U+O�U,OO�',c:'mint',text:'U�O�USU. O�O"U+O USO"OO�U,U�U. U^USO3O1O_U�U. USO OO"OUSO"USOO'},
+ {name:'U�O�USU.',c:'cream',text:'U?OU�O� O�U^U, U.O�Oc U,U,O�U,US O�U+U�U�O�O�O�U^O�OY OOU�O�O1U,USU�O. O_U,U^U,O�US O"O�U,O_O. U,U� O,O�U+O3U"Oc U.O�O�O�O?U?US U?O�OU�O� U?O�OU�O� dYZ%'}
+];
+
+/* ---------- Sender state ---------- */
+var GUESTS=[],GI=0,BS=false,SENDING=false;
+var MSG_TEXT='أهلًا {NAME} 🌹\nحسن وآية بيبعتولك دعوة فرحهم 💌\n{LINK}\n١٨ نوفمبر · ٨ مساءً · ليلة العمر (عزبة النخل)\nمستنيينك تفرح معانا ❤️';
+
+function demoGuests(){var a=[];try{(JSON.parse(localStorage.getItem('gift.demo.guests')||'[]')).forEach(function(g){a.push({id:g.id,name:g.name,phone:g.phone,status:g.status||'pending'});});}catch(e){}return a;}
+function loadDemo(){GUESTS=demoGuests();GI=0;if(!GUESTS.length){GUESTS=DEMO_MSGS.map(function(m,i){return {id:String(i+1),name:m.name,phone:'',status:'pending',text:m.text};});}renderCard();}
+
+function renderCard(){
+  if(GUESTS[GI]){
+    var g=GUESTS[GI];
+    $('cardName').textContent=g.name||'ضيف';
+    $('cardPhone').textContent=String(g.phone||'');
+    var st=g.status||'pending';
+    $('cardChip').textContent=st==='sent'?'اتبعت ✅':(st==='responded'?'رد قبل ما اتبعت':'لسه مش اتبعت');
+    $('cardChip').classList.toggle('sent',st==='sent');
+    var btn=$('sendBtn');
+    btn.disabled=!!st;
+    btn.textContent=st==='sent'?'✅ اتبعت':'📤 ابعت واتساب';
+    show('sCard');setUI(true);$('stage').innerHTML='';setCnt();
+  }else{show('sDone');setUI(false);}
+}
+function setBtn(){var g=$('go');g.textContent=SENDING?'بتبعت…':(GUESTS[GI]&&GUESTS[GI].status==='sent'?'✅ اتبعت':'ابعت واتساب');g.disabled=!!(SENDING||BS);}
+async function doSend(){
+  var g=GUESTS[GI];if(!g||SENDING)return;
+  if(g.status==='sent'){GI++;renderCard();return;}
+  SENDING=true;setBtn();
+  try{
+    var mr=await jsonp({action:'mark',key:KEY,pin:PIN,side:SIDE,id:g.id});
+    var L=(API+(API.indexOf('?')>=0?'&':'?')+'name='+encodeURIComponent(g.name||'')+'&id='+encodeURIComponent(g.id||''))+(API.indexOf('#')>=0?'&':'#')+'e='+encodeURIComponent(API)+'&w='+encodeURIComponent(COUPLE_WA);var txt=String(MSG_TEXT).replace(/\{NAME\}/g,(g.name||'').replace(/\n/g,' ')).replace(/\{ID\}/g,String(g.id||'')).replace(/\{PHONE\}/g,String(g.phone||'')).replace(/\{LINK\}/g,L);
+    var num=String(g.phone||'').replace(/\D/g,'');
+    var url='https://wa.me/'+num+'?text='+encodeURIComponent(txt);
+    window.open(url,'_blank');
+    g.status='sent';g.sentAt=new Date().toISOString();
+    GI++;renderCard();
+  }catch(e){
+    toast('حصلت مشكلة، حاول تاني');
+  }finally{SENDING=false;setBtn();}
+}
+function go(delta){var ni=GI+delta;if(ni<0)return;if(ni>=GUESTS.length){GI=0;renderCard();return;}GI=ni;renderCard();}
+function skip(){GI++;renderCard();}
+function back(){GI--;if(GUESTS[GI])renderCard();else{show('sDone');setUI(false);}}
+
+function pinGate(msg){setUI(false);show('sPin');$('pinErr').textContent=msg||'';var inp=$('pinInput'),btn=$('pinGo');inp.value='';inp.disabled=false;btn.disabled=false;setTimeout(function(){try{inp.focus();}catch(e){}},150);}
+function lockScreen(res){setUI(false);show('sLock');$('lockP').textContent='';var off=Date.parse(res.now)-Date.now(),target=Date.parse(res.unlockAt);function tick(){var ms=target-(Date.now()+off);if(ms<=0){clearInterval(cdT);init();return;}var s=Math.floor(ms/1000);$('cdD').textContent=ar(Math.floor(s/86400));$('cdH').textContent=ar(Math.floor(s%86400/3600));$('cdM').textContent=ar(Math.floor(s%3600/60));$('cdS').textContent=ar(s%60);}var cdT=null;clearInterval(cdT);tick();cdT=setInterval(tick,1000);}
+
+function start(pin,remember){
+  setUI(false);show('sLoad');
+  var f=(document.fonts&&document.fonts.load)?Promise.race([document.fonts.load('17px "Aref Ruqaa"'),sleep(1800)]):Promise.resolve();
+  Promise.all([loadData(pin),f]).then(function(r){
+    var res=r[0];if(!res||!res.ok)throw new Error((res&&res.error)||'failed');
+    if(remember){PIN=pin;try{sessionStorage.setItem(PIN_KEY,pin);}catch(e){}}
+    if(res.locked){lockScreen(res);return;}
+    var list=res.guests||[];
+    GUESTS=list;GI=0;
+    if(!GUESTS.length){hideAll();setUI(false);show('sEmpty');return;}
+    hideAll();setUI(true);renderCard();
+  }).catch(function(e){
+    var m=String(e&&e.message||e);
+    if(m==='bad_pin'){PIN='';try{sessionStorage.removeItem(PIN_KEY);}catch(e){}pinGate('PIN خاطئ، حاول تاني');return;}
+    if(m==='unauthorized'){fail('غير مصرح',String(e&&e.error||''));return;}
+    fail('حصلت مشكلة','حاول مرة تانية.');
+  });
+}
+function init(){if(DEMO){loadDemo();return;}if(!API){fail('ما حددتش الـAPI','رجع للـsetup ده.');return;}if(!KEY){fail('ما حددتش المفتاح','رجب للـsetup ده.');return;}if(PIN){start(PIN,false);return;}pinGate('');}
+
+$('pinGo').onclick=function(){var v=String($('pinInput').value||'').replace(/\D/g,'');if(v.length!==4){$('pinErr').textContent='PIN لازم يكون 4 أرقام.';return;}$('pinGo').disabled=true;start(v,true);};
+$('pinInput').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('pinGo').click();}});
+$('go').onclick=function(){if(!GUESTS.length)return;if(GUESTS[GI]&&GUESTS[GI].status==='sent'){skip();return;}doSend();};
+$('next').onclick=function(){if(GUESTS.length){GI++;renderCard();}};
+$('prev').onclick=function(){if(GUESTS.length){GI--;renderCard();}};
+$('sendBtn').onclick=function(){doSend();};
+$('skipBtn').onclick=function(){skip();};
+$('backBtn').onclick=function(){back();};
+document.addEventListener('keydown',function(e){if(e.key==='ArrowLeft'){$('prev').click();}else if(e.key==='ArrowRight'){$('next').click();}});
+$('lockBtn').onclick=function(){init();};setUI(false);init();
+})();
+</script>
+</body>
+</html>
+
+

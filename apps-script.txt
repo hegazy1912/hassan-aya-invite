@@ -1,19 +1,21 @@
-var ADMIN_KEY = '__ADMIN_KEY__';
-// مفتاح تاني مخصوص للعريس عشان يفتح الرسايل (غير ADMIN_KEY). حطه في لينك العريس بس.
+﻿var ADMIN_KEY = '__ADMIN_KEY__';
+// Ù…ÙØªØ§Ø­ ØªØ§Ù†ÙŠ Ù…Ø®ØµØµ Ù„Ù„Ø¹Ø±ÙŠØ³ Ø¹Ø´Ø§Ù† ÙŠÙØªØ­ Ø§Ù„Ø±Ø³Ø§ÙŠÙ„ (ØºÙŠØ± ADMIN_KEY). Ø­Ø·Ù‡ ÙÙŠ Ù„ÙŠÙ†Ùƒ Ø§Ù„Ø¹Ø±ÙŠØ³ Ø¨Ø³.
 var MSG_KEY = '__MSG_KEY__';
-// PIN إضافي للعريس (4 أرقام). مش موجود في اللينك — العريس بيكتبه مرة واحدة. سيبه فاضي لو مش عايز PIN.
+// Ù…ÙØªØ§Ø­ ØªØ§Ù†ÙŠ Ù…Ø®ØµØµ Ù„Ù„Ø¹Ø±ÙˆØ³Ø© Ø¹Ø´Ø§Ù† ØªÙØªØ­ Ø§Ù„Ø±Ø³Ø§ÙŠÙ„ (ØºÙŠØ± ADMIN_KEY ÙˆÙ…ÙØªØ§Ø­ Ø§Ù„Ø¹Ø±ÙŠØ³). Ø­Ø·Ù‡ ÙÙŠ Ù„ÙŠÙ†Ùƒ Ø§Ù„Ø¹Ø±ÙˆØ³Ø© Ø¨Ø³.
+var MSG_BRIDE_KEY = '__MSG_BRIDE_KEY__';
+// Ø§Ù„Ø±Ø³Ø§ÙŠÙ„ Ø¨ØªÙØ¶Ù„ Ù…Ù‚ÙÙˆÙ„Ø© Ù„Ø­Ø¯ Ø§Ù„ÙˆÙ‚Øª Ø¯Ù‡ (Ø¨Ø¹Ø¯ Ø§Ù„ÙØ±Ø­). Ø§Ù„ÙØ±Ø­ 18 Ù†ÙˆÙÙ…Ø¨Ø± 2026 â€” Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ: 19 Ù†ÙˆÙÙ…Ø¨Ø± Ø§Ù„Ø³Ø§Ø¹Ø© 10 ØµØ¨Ø§Ø­Ù‹Ø§ Ø¨ØªÙˆÙ‚ÙŠØª Ø§Ù„Ù‚Ø§Ù‡Ø±Ø©.
 var MSG_PIN = '__MSG_PIN__';
-// الرسايل بتفضل مقفولة لحد الوقت ده (بعد الفرح). الفرح 18 نوفمبر 2026 — الافتراضي: 19 نوفمبر الساعة 10 صباحًا بتوقيت القاهرة.
+var MSG_BRIDE_PIN = '__MSG_BRIDE_PIN__';
 var UNLOCK_AT = '2026-11-19T10:00:00+02:00';
-var MSG_SHEET_NAME = 'الرسايل';
-var MSG_HEADERS = ['الترتيب', 'وقت الإرسال', 'كود الضيف', 'الاسم', 'لون الورقة', 'الرسالة'];
+var MSG_SHEET_NAME = 'Ø§Ù„Ø±Ø³Ø§ÙŠÙ„';
+var MSG_HEADERS = ['Ø§Ù„ØªØ±ØªÙŠØ¨', 'ÙˆÙ‚Øª Ø§Ù„Ø¥Ø±Ø³Ø§Ù„', 'ÙƒÙˆØ¯ Ø§Ù„Ø¶ÙŠÙ', 'Ø§Ù„Ø§Ø³Ù…', 'Ù„ÙˆÙ† Ø§Ù„ÙˆØ±Ù‚Ø©', 'Ø§Ù„Ø±Ø³Ø§Ù„Ø©'];
 var MSG_MAX_LEN = 300;
 var MSG_MAX_PER_GUEST = 5;
 var MSG_COLORS = ['cream', 'rose', 'sky', 'mint'];
-var SHEET_NAME = 'الضيوف';
-var HEADERS = ['الكود', 'الاسم', 'الموبايل', 'الحالة', 'وقت الرد', 'وقت الإرسال', 'الطرف'];
-var STATUS = { yes: 'جاي', no: 'مش جاي', pending: 'لسه' };
-var SIDES = { groom: 'العريس', bride: 'العروسة' };
+var SHEET_NAME = 'Ø§Ù„Ø¶ÙŠÙˆÙ';
+var HEADERS = ['Ø§Ù„ÙƒÙˆØ¯', 'Ø§Ù„Ø§Ø³Ù…', 'Ø§Ù„Ù…ÙˆØ¨Ø§ÙŠÙ„', 'Ø§Ù„Ø­Ø§Ù„Ø©', 'ÙˆÙ‚Øª Ø§Ù„Ø±Ø¯', 'ÙˆÙ‚Øª Ø§Ù„Ø¥Ø±Ø³Ø§Ù„', 'Ø§Ù„Ø·Ø±Ù'];
+var STATUS = { yes: 'Ø¬Ø§ÙŠ', no: 'Ù…Ø´ Ø¬Ø§ÙŠ', pending: 'Ù„Ø³Ù‡' };
+var SIDES = { groom: 'Ø§Ù„Ø¹Ø±ÙŠØ³', bride: 'Ø§Ù„Ø¹Ø±ÙˆØ³Ø©' };
 
 function doGet(e) {
   var p = (e && e.parameter) || {};
@@ -25,19 +27,31 @@ function doGet(e) {
     locked = lock.waitLock(15000);
     var sh = getSheet_();
     var action = String(p.action || 'rsvp').toLowerCase();
+    var side = String(p.side || '').trim().toLowerCase();
+    if (side !== 'groom' && side !== 'bride') side = '';
+    function isMsgKeyOk(mkey, mpin, mside) {
+      var pin = mside === 'bride' ? String(MSG_BRIDE_PIN || '').trim() : String(MSG_PIN || '').trim();
+      var key = mside === 'bride' ? String(MSG_BRIDE_KEY || '').trim() : String(MSG_KEY || '').trim();
+      if (String(pin) !== '' && String(mpin || '') !== String(pin)) return false;
+      return String(mkey || '') === String(key);
+    }
     if (action === 'rsvp') {
       out = doRsvp_(sh, p);
     } else if (action === 'msg') {
       out = doMsg_(sh, p);
     } else if (action === 'msgcount') {
-      out = { count: msgCount_() };
+      out = { count: msgCount_(sh, side) };
     } else if (action === 'check') {
       out = doCheck_(sh, p);
     } else if (action === 'msgs') {
-      if (String(p.key || '') !== MSG_KEY) throw new Error('unauthorized');
-      var pin = String(p.pin || '').trim();
-      if (String(MSG_PIN || '').trim() !== '' && pin !== String(MSG_PIN).trim()) throw new Error('bad_pin');
-      out = doMsgs_();
+      if (!isMsgKeyOk(p.key, p.pin, side)) throw new Error('bad_pin');
+      out = doMsgs_(sh, side);
+    } else if (action === 'sendlist') {
+      if (!isMsgKeyOk(p.key, p.pin, side)) throw new Error('unauthorized');
+      out = doSendList_(sh, side);
+    } else if (action === 'mark') {
+      if (!isMsgKeyOk(p.key, p.pin, side)) throw new Error('unauthorized');
+      out = doMarkSent_(sh, p);
     } else {
       if (String(p.key || '') !== ADMIN_KEY) throw new Error('unauthorized');
       if (action === 'list') out = doList_(sh);
@@ -137,8 +151,15 @@ function phoneSet_(sh) {
 
 function normSide_(v) {
   var s = String(v || '').trim();
-  if (s === SIDES.groom || s === 'عريس' || s === 'groom') return SIDES.groom;
-  if (s === SIDES.bride || s === 'عروسة' || s === 'bride') return SIDES.bride;
+  if (s === SIDES.groom || s === 'Ø¹Ø±ÙŠØ³' || s === 'groom') return SIDES.groom;
+  if (s === SIDES.bride || s === 'Ø¹Ø±ÙˆØ³Ø©' || s === 'bride') return SIDES.bride;
+  return '';
+}
+
+function normSideKey_(v) {
+  var s = String(v || '').trim().toLowerCase();
+  if (s === 'groom' || s === SIDES.groom || s === 'Ø¹Ø±ÙŠØ³') return 'groom';
+  if (s === 'bride' || s === SIDES.bride || s === 'Ø¹Ø±ÙˆØ³Ø©') return 'bride';
   return '';
 }
 
@@ -181,7 +202,7 @@ function doList_(sh) {
       side: String(r[6] || '').trim()
     });
   }
-  return { guests: out, count: out.length };
+  return { ok: true, guests: out, count: out.length };
 }
 
 function doAdd_(sh, p) {
@@ -288,7 +309,7 @@ function reply_(obj, cb) {
 }
 
 
-// ============ رسايل الضيوف للعرسان (سرية لحد بعد الفرح) ============
+// ============ Ø±Ø³Ø§ÙŠÙ„ Ø§Ù„Ø¶ÙŠÙˆÙ Ù„Ù„Ø¹Ø±Ø³Ø§Ù† (Ø³Ø±ÙŠØ© Ù„Ø­Ø¯ Ø¨Ø¹Ø¯ Ø§Ù„ÙØ±Ø­) ============
 function getMsgSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   if (!ss) throw new Error('open_this_script_from_the_sheet');
@@ -300,16 +321,32 @@ function getMsgSheet_() {
     sh.getRange(1, 1, 1, MSG_HEADERS.length).setFontWeight('bold').setBackground('#f3e9d8');
     sh.setColumnWidth(6, 520);
     sh.getRange(2, 6, 2000, 1).setWrap(true);
-    // الشيت ده بيتخبّي عشان محدش يشوف الرسايل بالغلط قبل الفرح (تقدر تظهره من View > Hidden sheets)
+    // Ø§Ù„Ø´ÙŠØª Ø¯Ù‡ Ø¨ÙŠØªØ®Ø¨Ù‘ÙŠ Ø¹Ø´Ø§Ù† Ù…Ø­Ø¯Ø´ ÙŠØ´ÙˆÙ Ø§Ù„Ø±Ø³Ø§ÙŠÙ„ Ø¨Ø§Ù„ØºÙ„Ø· Ù‚Ø¨Ù„ Ø§Ù„ÙØ±Ø­ (ØªÙ‚Ø¯Ø± ØªØ¸Ù‡Ø±Ù‡ Ù…Ù† View > Hidden sheets)
     try { sh.hideSheet(); } catch (e) {}
   }
   return sh;
 }
 
-function msgCount_() {
-  var sh = getMsgSheet_();
-  var last = sh.getLastRow();
-  return last < 2 ? 0 : last - 1;
+function msgCount_(sh, side) {
+  var guestSh = sh || getSheet_();
+  var msgSh = getMsgSheet_();
+  var last = msgSh.getLastRow();
+  if (last < 2) return 0;
+  var textCol = msgSh.getRange(2, 6, last - 1, 1).getValues();
+  var idCol = msgSh.getRange(2, 3, last - 1, 1).getValues();
+  var out = 0;
+  for (var i = 0; i < textCol.length; i++) {
+    var txt = String(textCol[i][0] || '').trim();
+    if (!txt) continue;
+    if (side) {
+      var gid = String(idCol[i][0] || '');
+      var row = findRow_(guestSh, gid);
+      if (!row) continue;
+      if (normSideKey_(guestSh.getRange(row, 7).getValue()) !== side) continue;
+    }
+    out++;
+  }
+  return out;
 }
 
 function doMsg_(guestSh, p) {
@@ -331,28 +368,35 @@ function doMsg_(guestSh, p) {
     if (n >= MSG_MAX_PER_GUEST) throw new Error('limit');
   }
   var order = Math.max(0, last - 1) + 1;
-  // بنكتب النص كنص عادي (بنمنع أي معادلة تشتغل في الشيت)
+  // Ø¨Ù†ÙƒØªØ¨ Ø§Ù„Ù†Øµ ÙƒÙ†Øµ Ø¹Ø§Ø¯ÙŠ (Ø¨Ù†Ù…Ù†Ø¹ Ø£ÙŠ Ù…Ø¹Ø§Ø¯Ù„Ø© ØªØ´ØªØºÙ„ ÙÙŠ Ø§Ù„Ø´ÙŠØª)
   var safe = /^[=+\-@]/.test(text) ? "'" + text : text;
   sh.appendRow([order, new Date(), id, name, color, safe]);
   return { count: order };
 }
 
-// للعريس بس: لو لسه قبل UNLOCK_AT بيرجّع locked من غير أي رسالة
-function doMsgs_() {
+// Ù„Ù„Ø¹Ø±ÙŠØ³ Ø¨Ø³: Ù„Ùˆ Ù„Ø³Ù‡ Ù‚Ø¨Ù„ UNLOCK_AT Ø¨ÙŠØ±Ø¬Ù‘Ø¹ locked Ù…Ù† ØºÙŠØ± Ø£ÙŠ Ø±Ø³Ø§Ù„Ø©
+function doMsgs_(sh, side) {
+  var guestSh = sh || getSheet_();
+  var msgSh = getMsgSheet_();
   var unlockMs = new Date(UNLOCK_AT).getTime();
-  var count = msgCount_();
+  var count = msgCount_(guestSh, side);
   var now = Date.now();
   if (isNaN(unlockMs) || now < unlockMs) {
     return { locked: true, unlockAt: UNLOCK_AT, now: new Date(now).toISOString(), count: count, messages: [] };
   }
-  var sh = getMsgSheet_();
-  var last = sh.getLastRow();
+  var last = msgSh.getLastRow();
   var out = [];
   if (last >= 2) {
-    var vals = sh.getRange(2, 1, last - 1, MSG_HEADERS.length).getValues();
+    var vals = msgSh.getRange(2, 1, last - 1, MSG_HEADERS.length).getValues();
     for (var i = 0; i < vals.length; i++) {
       var r = vals[i];
       if (String(r[5]).trim() === '') continue;
+      if (side) {
+        var gid = String(r[2] || '');
+        var grow = findRow_(guestSh, gid);
+        if (!grow) continue;
+        if (normSideKey_(guestSh.getRange(grow, 7).getValue()) !== side) continue;
+      }
       out.push({
         n: Number(r[0]) || (i + 1),
         t: iso_(r[1]),
@@ -364,3 +408,37 @@ function doMsgs_() {
   }
   return { locked: false, unlockAt: UNLOCK_AT, now: new Date(now).toISOString(), count: out.length, messages: out };
 }
+
+function doSendList_(sh, side) {
+  var guestSh = sh || getSheet_();
+  var last = guestSh.getLastRow();
+  var out = [];
+  if (last < 2) return { guests: out, count: 0 };
+  var vals = guestSh.getRange(2, 1, last - 1, HEADERS.length).getValues();
+  for (var j = 0; j < vals.length; j++) {
+    var r = vals[j];
+    if (String(r[0]).trim() === '') continue;
+    var gside = normSideKey_(r[6]);
+    if (side && gside !== side) continue;
+    out.push({
+      id: String(r[0]),
+      name: String(r[1] || ''),
+      phone: String(r[2] || ''),
+      status: String(r[3] || '').trim() || STATUS.pending,
+      respondedAt: iso_(r[4]),
+      sentAt: iso_(r[5]),
+      side: gside
+    });
+  }
+  return { ok: true, guests: out, count: out.length };
+}
+
+function doMarkSent_(sh, p) {
+  var id = String(p.id || '').trim();
+  var row = findRow_(sh, id);
+  if (!row) throw new Error('not_found');
+  sh.getRange(row, 6).setValue(new Date());
+  return { id: id, sent: true };
+}
+
+
