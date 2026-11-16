@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#070a12;--panel:#0e1320;--panel2:#131a2a;--line:rgba(216,184,120,.22);--gold:#d8b878;--cream:#f8f1e4;--muted:rgba(248,241,228,.55);--green:#25d366;--red:#ff7a7a;--blue:#8fc7ff}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -99,6 +100,8 @@ option{background:#0d1220;color:var(--cream)}
 .chip.st.no{background:rgba(255,122,122,.12);color:#ffb1b1;border:1px solid rgba(255,122,122,.32)}
 .chip.st.pending{background:rgba(216,184,120,.10);color:var(--gold);border:1px solid rgba(216,184,120,.3)}
 .chip.sent{background:rgba(143,199,255,.10);color:#b6dcff;border:1px solid rgba(143,199,255,.28)}
+.chip.side.groom{background:rgba(216,184,120,.12);color:var(--gold);border:1px solid rgba(216,184,120,.35)}
+.chip.side.bride{background:rgba(255,150,190,.12);color:#ffc1d6;border:1px solid rgba(255,150,190,.35)}
 .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
 .acts .btn{padding:7px 12px;font-size:11px}
 .acts select{width:auto;min-width:92px;padding:7px 10px;font-size:11px;border-radius:999px}
@@ -183,6 +186,7 @@ details .hint{margin-top:10px}
       <div class="stat pending"><span>لسه مردش</span><b id="stPending">0</b></div>
       <div class="stat sent"><span>اتبعتله</span><b id="stSent">0</b></div>
     </div>
+    <p class="hint" id="sideStats" style="margin:-6px 0 14px"></p>
 
     <section class="panel" id="msgPanel" style="margin-bottom:16px">
       <h2>💌 رسايل الضيوف للعرسان <span class="chip sent" id="msgCnt" style="margin-right:8px">٠ رسالة</span></h2>
@@ -203,6 +207,11 @@ details .hint{margin-top:10px}
             <p class="hint">كل سطر: الاسم ثم الموبايل. مثال: <span dir="ltr">Ahmed Ali, 01012345678</span></p>
           </div>
         </div>
+        <label for="side">الطرف</label>
+        <select id="side">
+          <option value="العريس">العريس</option>
+          <option value="العروسة">العروسة</option>
+        </select>
         <label for="bulk">الأسماء والأرقام</label>
         <textarea id="bulk" placeholder="محمود حسن, 01012345678&#10;سارة محمد, 01198765432&#10;Omar - 01234567890&#10;ضيف بدون رقم"></textarea>
         <div class="addActions">
@@ -220,8 +229,16 @@ details .hint{margin-top:10px}
           </div>
           <span class="listCount" id="listCount"></span>
         </div>
-        <div class="searchWrap" style="margin-top:12px">
-          <input id="search" type="search" placeholder="دوّر بالاسم أو الرقم..." autocomplete="off">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center">
+          <div class="searchWrap" style="flex:1;min-width:200px">
+            <input id="search" type="search" placeholder="دوّر بالاسم أو الرقم..." autocomplete="off">
+          </div>
+          <select id="sideFilter" style="width:auto;min-width:150px">
+            <option value="all">كل الأطراف</option>
+            <option value="العريس">العريس</option>
+            <option value="العروسة">العروسة</option>
+            <option value="">غير محدد</option>
+          </select>
         </div>
         <div class="filters" id="filters">
           <button data-f="all" class="on">الكل</button>
@@ -229,6 +246,10 @@ details .hint{margin-top:10px}
           <button data-f="no">مش جاي</button>
           <button data-f="pending">لسه</button>
           <button data-f="unsent">ماتبعتش</button>
+        </div>
+        <div class="addActions" style="margin-top:0;margin-bottom:10px">
+          <button class="btn gold" id="exportGroom">تصدير شيت العريس (Excel)</button>
+          <button class="btn gold" id="exportBride">تصدير شيت العروسة (Excel)</button>
         </div>
         <div class="rows" id="rows"></div>
       </section>
@@ -250,12 +271,13 @@ details .hint{margin-top:10px}
     couple:localStorage.getItem('gift.couple')||String(GIFT.COUPLE_WA||''),
     guests:[],
     filter:'all',
+    side:'all',
     q:'',
     busy:false
   };
   var apiEl=$('#api'),keyEl=$('#key'),baseEl=$('#base'),coupleEl=$('#couple'),setupEl=$('#setup'),dashEl=$('#dash');
   var setupMsg=$('#setupMsg'),warnBar=$('#warnBar'),toastEl=$('#toast');
-  var rowsEl=$('#rows'),searchEl=$('#search'),listCount=$('#listCount'),bulkEl=$('#bulk');
+  var rowsEl=$('#rows'),searchEl=$('#search'),listCount=$('#listCount'),bulkEl=$('#bulk'),sideEl=$('#side'),sideFilterEl=$('#sideFilter');
   var addBtn=$('#addBtn');
 
   function defaultBase(){
@@ -465,6 +487,7 @@ details .hint{margin-top:10px}
       var g=parseLine(line);
       if(!g)return;
       if(!g.name){skipped++;return;}
+      g.side=sideEl.value;
       list.push(g);
     });
     if(!list.length){toast('اكتب اسم ضيف واحد على الأقل');return;}
@@ -517,6 +540,14 @@ details .hint{margin-top:10px}
       toast('اتحدثت الحالة');
     }).catch(function(err){toast('مش قادر أعدل: '+String(err.message||err));});
   }
+  function setSide(id,side){
+    jsonp({action:'side',key:state.key,id:id,side:side}).then(function(res){
+      if(!res||!res.ok)throw new Error((res&&res.error)||'فشل');
+      var g=findGuest(id);
+      if(g){g.side=side;render();}
+      toast('اتحدد الطرف');
+    }).catch(function(err){toast('مش قادر أعدل: '+String(err.message||err));});
+  }
   function delGuest(id){
     if(!confirm('متأكد تحذف الضيف ده من القائمة؟'))return;
     jsonp({action:'del',key:state.key,id:id}).then(function(res){
@@ -537,21 +568,52 @@ details .hint{margin-top:10px}
       navigator.clipboard.writeText(t).then(function(){toast('اتنسخ ✅');},fallback);
     }else fallback();
   }
-  function exportCsv(){
-    if(!state.guests.length){toast('مفيش ضيوف تتصدر');return;}
-    var rows=[['الاسم','الموبايل','الحالة','اللينك','وقت الرد','وقت الإرسال']];
-    state.guests.forEach(function(g){
-      rows.push([g.name||'',g.phone||'',g.status||'لسه',linkFor(g),g.respondedAt||'',g.sentAt||'']);
-    });
-    var csv='\uFEFF'+rows.map(function(r){
-      return r.map(function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}).join(',');
-    }).join('\r\n');
-    var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  function downloadBlob(blob,name){
     var a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
-    a.download='guests.csv';
+    a.download=name;
     document.body.appendChild(a);a.click();a.remove();
     setTimeout(function(){URL.revokeObjectURL(a.href);},1200);
+  }
+  function csvText(rows){
+    return '\uFEFF'+rows.map(function(r){
+      return r.map(function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"';}).join(',');
+    }).join('\r\n');
+  }
+  function exportCsv(){
+    if(!state.guests.length){toast('مفيش ضيوف تتصدر');return;}
+    var rows=[['الاسم','الموبايل','الطرف','الحالة','اللينك','لينك الواتساب','وقت الرد','وقت الإرسال']];
+    state.guests.forEach(function(g){
+      rows.push([g.name||'',g.phone||'',g.side||'',g.status||'لسه',linkFor(g),waLink(g),g.respondedAt||'',g.sentAt||'']);
+    });
+    downloadBlob(new Blob([csvText(rows)],{type:'text/csv;charset=utf-8;'}),'guests.csv');
+  }
+  function exportSide(side){
+    var list=state.guests.filter(function(g){return (g.side||'')===side;});
+    if(!list.length){toast('مفيش ضيوف في طرف '+side);return;}
+    var rows=[['الاسم','الموبايل','الطرف','الحالة','لينك الواتساب','لينك الدعوة']],links=[];
+    list.forEach(function(g){
+      var wa=waLink(g)||'',site=linkFor(g)||'',phone=normalizePhone(g.phone);
+      rows.push([g.name||'',phone?'+'+phone:'',side,g.status||'لسه',wa,site]);
+      links.push({wa:wa,site:site});
+    });
+    if(window.XLSX){
+      var ws=XLSX.utils.aoa_to_sheet(rows);
+      for(var r=1;r<rows.length;r++){
+        var waCell=ws[XLSX.utils.encode_cell({r:r,c:4})];
+        if(waCell&&links[r-1].wa){waCell.v='افتح واتساب';waCell.l={Target:links[r-1].wa,Tooltip:'افتح واتساب وابعت الدعوة'};}
+        var siteCell=ws[XLSX.utils.encode_cell({r:r,c:5})];
+        if(siteCell&&links[r-1].site){siteCell.v='افتح الدعوة';siteCell.l={Target:links[r-1].site,Tooltip:'لينك الدعوة'};}
+      }
+      ws['!cols']=[{wch:28},{wch:16},{wch:12},{wch:10},{wch:18},{wch:18}];
+      ws['!autofilter']={ref:'A1:F'+rows.length};
+      var wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws,side);
+      XLSX.writeFile(wb,'دعوات-'+side+'.xlsx');
+    }else{
+      downloadBlob(new Blob([csvText(rows)],{type:'text/csv;charset=utf-8;'}),'دعوات-'+side+'.csv');
+      toast('تم تنزيل CSV (مكتبة Excel مش متاحة)');
+    }
   }
 
   function stats(){
@@ -571,6 +633,7 @@ details .hint{margin-top:10px}
     else if(f==='yes')list=list.filter(function(g){return g.status==='جاي';});
     else if(f==='no')list=list.filter(function(g){return g.status==='مش جاي';});
     else if(f==='pending')list=list.filter(function(g){return g.status!=='جاي'&&g.status!=='مش جاي';});
+    if(state.side!=='all')list=list.filter(function(g){return (g.side||'')===state.side;});
     if(state.q){
       var q=state.q.toLowerCase();
       list=list.filter(function(g){
@@ -582,18 +645,23 @@ details .hint{margin-top:10px}
   function rowHtml(g){
     var st=g.status||'لسه';
     var cls=st==='جاي'?'yes':st==='مش جاي'?'no':'pending';
+    var side=g.side||'';
+    var sideCls=side==='العروسة'?'bride':side==='العريس'?'groom':'';
     var wa=waLink(g);
     var meta='';
     if(g.sentAt)meta+='اتبعت: '+esc(fmtDate(g.sentAt));
     if(g.respondedAt)meta+=(meta?' &nbsp;·&nbsp; ':'')+'رد: '+esc(fmtDate(g.respondedAt));
     return '<article class="row" data-id="'+esc(g.id)+'">'
       +'<div class="who"><b>'+esc(g.name||'بدون اسم')+'</b><span class="phone">'+esc(fmtPhone(g.phone)||'بدون رقم')+'</span></div>'
-      +'<div class="tags"><span class="chip st '+cls+'">'+esc(st)+'</span>'+(g.sentAt?'<span class="chip sent">اتبعت</span>':'')+'</div>'
+      +'<div class="tags"><span class="chip st '+cls+'">'+esc(st)+'</span>'+(side?'<span class="chip side '+sideCls+'">'+esc(side)+'</span>':'')+(g.sentAt?'<span class="chip sent">اتبعت</span>':'')+'</div>'
       +'<div class="acts">'
       +(wa?'<a class="btn wa" data-id="'+esc(g.id)+'" href="'+esc(wa)+'" target="_blank" rel="noopener">واتساب</a>':'<span class="btn dis">بدون رقم</span>')
       +'<button class="btn copy" data-id="'+esc(g.id)+'">نسخ اللينك</button>'
       +'<select class="status" data-id="'+esc(g.id)+'">'
       +['جاي','مش جاي','لسه'].map(function(s){return '<option value="'+s+'"'+(s===st?' selected':'')+'>'+s+'</option>';}).join('')
+      +'</select>'
+      +'<select class="sideSel" data-id="'+esc(g.id)+'">'
+      +['العريس','العروسة',''].map(function(s){return '<option value="'+s+'"'+(s===side?' selected':'')+'>'+(s||'غير محدد')+'</option>';}).join('')
       +'</select>'
       +'<button class="btn del" data-id="'+esc(g.id)+'">حذف</button>'
       +'</div>'
@@ -607,6 +675,9 @@ details .hint{margin-top:10px}
     $('#stNo').textContent=s.no;
     $('#stPending').textContent=s.pending;
     $('#stSent').textContent=s.sent;
+    var sg=0,sb=0,su=0;
+    state.guests.forEach(function(g){if(g.side==='العريس')sg++;else if(g.side==='العروسة')sb++;else su++;});
+    $('#sideStats').textContent='العريس: '+sg+' · العروسة: '+sb+' · غير محدد: '+su;
     var list=filtered();
     listCount.textContent=list.length+' من '+s.total;
     if(!list.length){
@@ -629,16 +700,21 @@ details .hint{margin-top:10px}
   });
   rowsEl.addEventListener('change',function(e){
     var sel=e.target.closest('select.status');
-    if(sel)setStatus(sel.getAttribute('data-id'),sel.value);
+    if(sel){setStatus(sel.getAttribute('data-id'),sel.value);return;}
+    var sideSel=e.target.closest('select.sideSel');
+    if(sideSel)setSide(sideSel.getAttribute('data-id'),sideSel.value);
   });
 
   $('#refresh').onclick=function(){load(false);};
   $('#settings').onclick=function(){showSetup('');};
   $('#export').onclick=exportCsv;
+  $('#exportGroom').onclick=function(){exportSide('العريس');};
+  $('#exportBride').onclick=function(){exportSide('العروسة');};
   $('#saveSetup').onclick=saveSetup;
   addBtn.onclick=addGuests;
   $('#clearBtn').onclick=function(){bulkEl.value='';};
   searchEl.addEventListener('input',function(){state.q=searchEl.value.trim();render();});
+  sideFilterEl.addEventListener('change',function(){state.side=sideFilterEl.value;render();});
   $('#filters').addEventListener('click',function(e){
     var b=e.target.closest('button[data-f]');
     if(!b)return;

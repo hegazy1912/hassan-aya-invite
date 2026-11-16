@@ -9,8 +9,9 @@ var MSG_MAX_LEN = 300;
 var MSG_MAX_PER_GUEST = 5;
 var MSG_COLORS = ['cream', 'rose', 'sky', 'mint'];
 var SHEET_NAME = 'الضيوف';
-var HEADERS = ['الكود', 'الاسم', 'الموبايل', 'الحالة', 'وقت الرد', 'وقت الإرسال'];
+var HEADERS = ['الكود', 'الاسم', 'الموبايل', 'الحالة', 'وقت الرد', 'وقت الإرسال', 'الطرف'];
 var STATUS = { yes: 'جاي', no: 'مش جاي', pending: 'لسه' };
+var SIDES = { groom: 'العريس', bride: 'العروسة' };
 
 function doGet(e) {
   var p = (e && e.parameter) || {};
@@ -38,6 +39,7 @@ function doGet(e) {
       else if (action === 'addbulk') out = doAddBulk_(sh, p);
       else if (action === 'sent') out = doSent_(sh, p);
       else if (action === 'status') out = doStatus_(sh, p);
+      else if (action === 'side') out = doSide_(sh, p);
       else if (action === 'del') out = doDelete_(sh, p);
       else throw new Error('unknown_action');
     }
@@ -68,13 +70,27 @@ function getSheet_() {
     sh.setColumnWidth(4, 120);
     sh.setColumnWidth(5, 165);
     sh.setColumnWidth(6, 165);
+    sh.setColumnWidth(7, 120);
     var dv = SpreadsheetApp.newDataValidation()
       .requireValueInList([STATUS.yes, STATUS.no, STATUS.pending], true)
       .setAllowInvalid(true)
       .build();
     sh.getRange(2, 4, 2000, 1).setDataValidation(dv);
+    setSideValidation_(sh);
+  } else if (String(sh.getRange(1, 7).getValue()).trim() !== HEADERS[6]) {
+    sh.getRange(1, 7).setValue(HEADERS[6]).setFontWeight('bold').setBackground('#f3e9d8');
+    sh.setColumnWidth(7, 120);
+    setSideValidation_(sh);
   }
   return sh;
+}
+
+function setSideValidation_(sh) {
+  var dv = SpreadsheetApp.newDataValidation()
+    .requireValueInList([SIDES.groom, SIDES.bride], true)
+    .setAllowInvalid(true)
+    .build();
+  sh.getRange(2, 7, 2000, 1).setDataValidation(dv);
 }
 
 function findRow_(sh, id) {
@@ -99,6 +115,13 @@ function normPhone_(v) {
   if (s.length === 11 && s.charAt(0) === '0') s = '20' + s.slice(1);
   else if (s.length === 10 && s.charAt(0) === '1') s = '20' + s;
   return s;
+}
+
+function normSide_(v) {
+  var s = String(v || '').trim();
+  if (s === SIDES.groom || s === 'عريس' || s === 'groom') return SIDES.groom;
+  if (s === SIDES.bride || s === 'عروسة' || s === 'bride') return SIDES.bride;
+  return '';
 }
 
 function iso_(v) {
@@ -136,7 +159,8 @@ function doList_(sh) {
       phone: String(r[2] || ''),
       status: String(r[3] || '').trim() || STATUS.pending,
       respondedAt: iso_(r[4]),
-      sentAt: iso_(r[5])
+      sentAt: iso_(r[5]),
+      side: String(r[6] || '').trim()
     });
   }
   return { guests: out, count: out.length };
@@ -146,8 +170,9 @@ function doAdd_(sh, p) {
   var name = String(p.name || '').trim().slice(0, 120);
   if (!name) throw new Error('name_required');
   var id = makeId_();
-  sh.appendRow([id, name, normPhone_(p.phone || ''), STATUS.pending, '', '']);
-  return { id: id, name: name };
+  var side = normSide_(p.side);
+  sh.appendRow([id, name, normPhone_(p.phone || ''), STATUS.pending, '', '', side]);
+  return { id: id, name: name, side: side };
 }
 
 function doAddBulk_(sh, p) {
@@ -163,7 +188,7 @@ function doAddBulk_(sh, p) {
     var g = arr[i] || {};
     var name = String(g.name || '').trim().slice(0, 120);
     if (!name) continue;
-    rows.push([makeId_(), name, normPhone_(g.phone || ''), STATUS.pending, '', '']);
+    rows.push([makeId_(), name, normPhone_(g.phone || ''), STATUS.pending, '', '', normSide_(g.side)]);
   }
   if (!rows.length) return { added: 0 };
   sh.getRange(sh.getLastRow() + 1, 1, rows.length, HEADERS.length).setValues(rows);
@@ -188,6 +213,17 @@ function doStatus_(sh, p) {
   sh.getRange(row, 4).setValue(status);
   if (status !== STATUS.pending) sh.getRange(row, 5).setValue(new Date());
   return { id: id, status: status };
+}
+
+function doSide_(sh, p) {
+  var id = String(p.id || '').trim();
+  var raw = String(p.side || '').trim();
+  var side = normSide_(raw);
+  if (raw !== '' && side === '') throw new Error('bad_side');
+  var row = findRow_(sh, id);
+  if (!row) throw new Error('not_found');
+  sh.getRange(row, 7).setValue(side);
+  return { id: id, side: side };
 }
 
 function doDelete_(sh, p) {
