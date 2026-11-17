@@ -258,6 +258,7 @@ pre{margin:0;padding:16px;overflow:auto;max-height:340px;direction:ltr;text-alig
       return r.text();
     }).then(function(t){
       code=t;
+      codeEl.textContent=t;
       paint();
       msgEl.className='note';
       msgEl.textContent='الكود جاهز. لو الصفحة دي مفتوحة من الموقع المنشور، هتلاقي الكود فوق.';
