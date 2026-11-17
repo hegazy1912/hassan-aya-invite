@@ -204,6 +204,21 @@ details .hint{margin-top:10px}
       </div>
     </section>
 
+    <section class="panel" id="sidePanel" style="margin-bottom:16px">
+      <h2>📱 صفحات العريس والعروسة (كروت الإرسال)</h2>
+      <p class="hint">كل طرف بياخد لينك سري خاص بيه، بيشوف بيه ضيوف طرفه بس ويبعت الدعوات كروت ورا بعض. المفتاحين دول لازم يكونوا نفس <span dir="ltr">GROOM_KEY</span> و<span dir="ltr">BRIDE_KEY</span> في كود الشيت. الـPIN اختياري وبتبعته للشخص في رسالة منفصلة.</p>
+      <label for="gKey">مفتاح العريس</label>
+      <input id="gKey" type="text" dir="ltr" placeholder="GROOM-..." autocomplete="off">
+      <label for="bKey">مفتاح العروسة</label>
+      <input id="bKey" type="text" dir="ltr" placeholder="BRIDE-..." autocomplete="off">
+      <div class="setupActions" style="margin-top:12px">
+        <button class="btn gold" id="gCopy">نسخ لينك العريس</button>
+        <button class="btn gold" id="bCopy">نسخ لينك العروسة</button>
+        <button class="btn" id="gDemo">معاينة العريس</button>
+        <button class="btn" id="bDemo">معاينة العروسة</button>
+      </div>
+    </section>
+
     <div class="grid">
       <section class="panel">
         <div class="addHead">
@@ -788,6 +803,22 @@ details .hint{margin-top:10px}
   function groomLink(){var k=msgKeyEl.value.trim();if(!k)return '';return msgBase()+'#k='+encodeURIComponent(k)+'&e='+encodeURIComponent(state.api);}
   $('#msgCopy').onclick=function(){var l=groomLink();if(!l){toast('اكتب مفتاح الرسايل الأول');return;}copyText(l);};
   $('#msgDemo').onclick=function(){window.open(msgBase()+'?demo=1','_blank');};
+  var gKeyEl=$('#gKey'),bKeyEl=$('#bKey');
+  gKeyEl.value=localStorage.getItem('gift.gkey')||'';bKeyEl.value=localStorage.getItem('gift.bkey')||'';
+  gKeyEl.addEventListener('input',function(){localStorage.setItem('gift.gkey',gKeyEl.value.trim());});
+  bKeyEl.addEventListener('input',function(){localStorage.setItem('gift.bkey',bKeyEl.value.trim());});
+  function sideBase(f){var b=baseUrl();if(!/\/$/.test(b))b=b.replace(/[^\/]*$/,'');return b+(/\/$/.test(b)?'':'/')+f;}
+  function sideLink(f,k){
+    k=String(k||'').trim();if(!k)return '';
+    var h='#k='+encodeURIComponent(k)+'&e='+encodeURIComponent(state.api);
+    if(state.couple)h+='&w='+encodeURIComponent(normalizePhone(state.couple));
+    var b=baseUrl();if(/^https?:/i.test(b))h+='&b='+encodeURIComponent(b);
+    return sideBase(f)+h;
+  }
+  $('#gCopy').onclick=function(){var l=sideLink('groom.html',gKeyEl.value);if(!l){toast('اكتب مفتاح العريس الأول');return;}copyText(l);};
+  $('#bCopy').onclick=function(){var l=sideLink('bride.html',bKeyEl.value);if(!l){toast('اكتب مفتاح العروسة الأول');return;}copyText(l);};
+  $('#gDemo').onclick=function(){window.open(sideBase('groom.html')+'?demo=1','_blank');};
+  $('#bDemo').onclick=function(){window.open(sideBase('bride.html')+'?demo=1','_blank');};
   function loadMsgCount(){
     jsonp({action:'msgcount'}).then(function(r){if(r&&r.ok)$('#msgCnt').textContent=(r.count|0).toLocaleString('ar-EG')+' رسالة';}).catch(function(){});
   }
